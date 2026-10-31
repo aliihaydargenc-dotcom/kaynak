@@ -1,0 +1,36 @@
+{
+  "scope": "public-web-pages-only",
+  "method": "REA headless browser network capture in Microsoft Edge",
+  "raw_captures_in_repository": false,
+  "note": "These records summarize local REA browser observations. Capture artifacts are held outside this repository; evidence identifiers and SHA-256 hashes allow matching them to the original files. Public webpage observations do not establish private admin technology, internal APIs or live prices.",
+  "captures": [
+    {
+      "source_id": "pretix",
+      "start_url": "https://pretix.eu/",
+      "final_url": "https://pretix.eu/about/en/",
+      "evidence_id": "ev_2d7bd976fca2882c73b54696cc7766f85285b16602c5d5eae63d0154de01fbb8",
+      "raw_capture_filename": "rea-pretix-capture.json",
+      "raw_capture_sha256": "a9e6874f626d73945096390b9bfbb50f4d0c4146bde11e7ba63d3dbd5c2afbcd",
+      "observed_from_utc": "2026-10-31T22:27:53.542Z",
+      "observed_to_utc": "2026-10-31T22:27:58.506Z",
+      "retained_network_events": 198,
+      "capture_status": "complete",
+      "observations": ["Public landing page redirected to /about/en/", "Public page loaded static assets from static.pretix.cloud"],
+      "limits": "Does not prove the technology or behavior of pretix's private administration screens."
+    },
+    {
+      "source_id": "eventbrite",
+      "start_url": "https://www.eventbrite.com/",
+      "final_url": "https://www.eventbrite.com/",
+      "evidence_id": "ev_a42c19959ddd685b13408e3600d7cc6e1c732ee1600e3c855e157730e333edd2",
+      "raw_capture_filename": "rea-eventbrite-capture.json",
+      "raw_capture_sha256": "54bce328c579e0894d4b45d329e8c2ded0096de19ee00e5cab958b0d032d0d21",
+      "observed_from_utc": "2026-10-31T22:28:08.743Z",
+      "observed_to_utc": "2026-10-31T22:28:13.356Z",
+      "retained_network_events": 483,
+      "capture_status": "complete",
+      "observations": ["Public homepage included requests with paths /home/api/search/, /home/api/nearby_cities/ and /consumer-header/api/user", "Response payload included data-next-head markers"],
+      "limits": "Does not establish the technology of private organizer dashboards, databases or internal ticketing services."
+    }
+  ]
+}

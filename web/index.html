@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7fc">
+  <meta name="description" content="Etkinlik sistemleri ve otel fiyat API'leri için kaynaklı, doğrulanabilir teknik araştırma paneli.">
+  <title>Kaynak | Araştırma Merkezi</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#library">Kaynak listesine geç</a>
+  <div class="page">
+    <header class="topbar">
+      <a href="./" class="brand" aria-label="Kaynak, ana sayfa">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="m5 6 7-3 7 3v12l-7 3-7-3V6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 6l7 3 7-3M12 9v12" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </span>
+        <span>kaynak<span class="brand-point">.</span></span>
+      </a>
+      <div class="top-right"><span class="current-indicator"><span class="indicator-dot"></span>İncelenen kaynaklar</span><span class="date-label">01.11.2026</span></div>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> KURUMSAL ARAŞTIRMA / YAZILIM MİMARİSİ</div>
+          <h1 id="hero-title">Fikirden sisteme.<br><span class="headline-accent">Her karara bir kaynak.</span></h1>
+          <p>Etkinlik operasyonlarının çalışma mantığı, otel fiyat API'leri ve kendi yazılım projelerimizin teknik bulguları. Doğrulanmış kaynakları tek yerden keşfedin.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#library">Kaynakları incele <span aria-hidden="true">↗</span></a>
+            <a class="button subtle" href="../research/implementation-roadmap.md">Geliştirme yol haritası</a>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="Kaynaklardan ürün kararlarına uzanan iş akışı">
+          <div class="connection"></div>
+          <div class="art-pill pill-one"><span class="shape triangle"></span><span>Resmî doküman</span><span class="art-check">✓</span></div>
+          <div class="art-pill pill-two"><span class="shape circle"></span><span>REA gözlemi</span><span class="art-check">✓</span></div>
+          <div class="art-pill pill-three"><span class="shape square"></span><span>Kaynak kod</span><span class="art-check">✓</span></div>
+          <div class="art-conclusion"><span class="conclusion-icon">K</span><div><small>SONUÇ</small><strong>Kanıta dayalı karar</strong></div></div>
+          <span class="hero-grid-decoration" aria-hidden="true"></span>
+        </div>
+      </section>
+      <section class="overview" aria-label="Araştırma özeti">
+        <div class="stat"><span class="stat-value" id="source-count">—</span><span class="stat-label">Araştırma kaynağı</span></div>
+        <div class="stat"><span class="stat-value" id="event-count">—</span><span class="stat-label">Etkinlik / operasyon</span></div>
+        <div class="stat"><span class="stat-value" id="hotel-count">—</span><span class="stat-label">Otel / fiyat sistemleri</span></div>
+        <div class="overview-note"><span class="check-badge" aria-hidden="true">✓</span><div><strong>Kanıt etiketi zorunlu</strong><span>Doğrulanmamış teknoloji ve fiyatları ayırıyoruz.</span></div></div>
+      </section>
+      <section class="library" id="library" aria-labelledby="library-heading">
+        <div class="section-header">
+          <div><span class="section-eyebrow">ARAŞTIRMA KÜTÜPHANESİ</span><h2 id="library-heading">Kaynaklar ve bulgular</h2><p>Resmî belgeler, gözlemler ve kendi kod tabanlarımız.</p></div>
+          <div class="section-line" aria-hidden="true"></div>
+        </div>
+        <div class="toolbar">
+          <div class="search-wrapper">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <label class="visually-hidden" for="source-search">Kaynaklarda ara</label>
+            <input id="source-search" type="search" placeholder="Kaynak, teknoloji veya özellik ara..." autocomplete="off">
+          </div>
+          <div class="filters" role="group" aria-label="Kaynak kategorisi">
+            <button type="button" class="filter active" data-category="all" aria-pressed="true">Tümü</button>
+            <button type="button" class="filter" data-category="event" aria-pressed="false">Etkinlik</button>
+            <button type="button" class="filter" data-category="hotel" aria-pressed="false">Otel & fiyat</button>
+            <button type="button" class="filter" data-category="internal" aria-pressed="false">Projelerimiz</button>
+          </div>
+        </div>
+        <div class="result-bar"><span id="result-count" role="status" aria-live="polite">Kaynaklar yükleniyor…</span><span class="sort-hint">01 Kasım 2026 incelemesi</span></div>
+        <div id="cards" class="cards" aria-live="off"></div>
+        <div id="empty" class="empty" hidden><strong>Aramanızla eşleşen kayıt yok.</strong><p>Başka bir kaynak adı veya kategori deneyin.</p></div>
+      </section>
+      <section class="method" aria-labelledby="method-title">
+        <div><span class="section-eyebrow">METODOLOJİ</span><h2 id="method-title">Nasıl doğruluyoruz?</h2><p>Bir sistemin herkese açık sayfası, arka plandaki uygulamanın tamamını göstermez. Her teknik bulguyu hangi kanıttan çıkardığımızı işaretliyoruz.</p></div>
+        <div class="method-list"><div><span>01</span><strong>Resmî belgeleri oku</strong><small>API sözleşmesi, erişim ve kısıtlar</small></div><div><span>02</span><strong>Gözlemle ve kaydet</strong><small>REA ile anonim tarayıcı Evidence</small></div><div><span>03</span><strong>Kendi kodumuzla eşleştir</strong><small>Uygulanabilir mimari ve test</small></div></div>
+      </section>
+    </main>
+    <footer><span>kaynak<span class="brand-point">.</span> / teknik araştırma merkezi</span><span>Canlı API sorgusu yapılmaz · Son inceleme: 01.11.2026</span></footer>
+  </div>
+</body>
+</html>

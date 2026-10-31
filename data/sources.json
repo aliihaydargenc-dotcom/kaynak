@@ -1,0 +1,82 @@
+[
+  {
+    "id": "pretix",
+    "title": "pretix",
+    "category": "event",
+    "confidence": "official-docs-and-rea",
+    "summary": "Etkinlik, bilet, kota, check-in ve webhook odaklı açık kaynak sistem. Tekrarlanan webhook teslimlerini tolere eden idempotent işlem gerekli.",
+    "features": ["Event", "Tickets", "Quotas", "Check-in", "Webhooks", "REST API"],
+    "technologies": ["Django (açık kaynak kod)", "REST API"],
+    "links": ["https://docs.pretix.eu/dev/api/", "https://docs.pretix.eu/dev/api/webhooks.html", "https://docs.pretix.eu/dev/api/resources/quotas.html"]
+  },
+  {
+    "id": "eventbrite",
+    "title": "Eventbrite",
+    "category": "event",
+    "confidence": "official-docs-and-rea",
+    "summary": "Etkinlik, organizatör, sipariş, katılımcı, bilet türü ve mekân için REST API ve webhook olayları. Genel sayfada gözlenen JS, yönetim paneli altyapısını kanıtlamaz.",
+    "features": ["Events", "Orders", "Attendees", "Venues", "Ticket Classes", "Webhooks"],
+    "technologies": ["Public REST API", "JSON", "OAuth2"],
+    "links": ["https://www.eventbrite.co.uk/platform/docs/", "https://www.eventbrite.co.uk/platform/docs/webhooks", "https://www.eventbrite.co.uk/platform/new/api"]
+  },
+  {
+    "id": "whova",
+    "title": "Whova",
+    "category": "event",
+    "confidence": "official-help",
+    "summary": "Etkinlik, gün veya oturum düzeyinde QR ile check-in; mobil personel ve yönetici ekranları. Uygulama teknolojisi doğrulanmadı.",
+    "features": ["Mobile App", "Event Agenda", "QR Check-in", "Session Tracking"],
+    "technologies": ["Belirlenmedi"],
+    "links": ["https://whova.zendesk.com/hc/en-us/articles/360020638492-Can-I-use-the-App-to-check-in-attendees", "https://whova.com/pages/frequently-asked-questions/"]
+  },
+  {
+    "id": "cvent",
+    "title": "Cvent",
+    "category": "event",
+    "confidence": "official-product-docs",
+    "summary": "CRM, pazarlama ve etkinlik verilerini entegre eden platform; API yetenekleri mevcut, özel altyapısı bilinmiyor.",
+    "features": ["Integrations", "Registration", "Attendee Data", "API"],
+    "technologies": ["Public developer APIs"],
+    "links": ["https://www.cvent.com/en/event-management-software/cvent-integrations"]
+  },
+  {
+    "id": "eventra",
+    "title": "EVENTRA (bizim kod tabanı)",
+    "category": "internal",
+    "confidence": "own-source-code",
+    "summary": "Otel gösteri operasyonu; personel ve grup eşleştirmesi, çakışma kontrolleri, saha ajandası, maliyet ve push/WhatsApp bildirimleri.",
+    "features": ["Operations Agenda", "Assignments", "Conflict Detection", "Costs", "Push", "Roles"],
+    "technologies": ["Next.js 16.4.3", "React 19", "TypeScript", "PostgreSQL", "Better Auth", "Motion"],
+    "links": ["https://github.com/aliihaydargenc-dotcom/bevisionevent"]
+  },
+  {
+    "id": "serpapi",
+    "title": "SerpApi Google Hotels",
+    "category": "hotel",
+    "confidence": "official-api-docs",
+    "summary": "Google Hotels tek mülk detayında fiyat listesi ve kaynak isimleri döndürebilir. Önbellek varsayılan olarak 1 saat; zorlanan yeni sorgular kotayı tüketebilir.",
+    "features": ["Google Hotels", "Property Token", "Source Prices", "Cache Policy"],
+    "technologies": ["HTTP JSON API"],
+    "links": ["https://serpapi.com/google-hotels-api", "https://serpapi.com/google-hotels-property-details"]
+  },
+  {
+    "id": "booking",
+    "title": "Booking.com Demand API",
+    "category": "hotel",
+    "confidence": "official-api-docs",
+    "summary": "Partner yapılandırması ve limitlere bağlı canlı otel teklifleri. Herkese açık sınırsız ve ücretsiz fiyat API'si değildir.",
+    "features": ["Accommodations", "Rates", "Partner Limits"],
+    "technologies": ["Partner REST API"],
+    "links": ["https://developers.booking.com/demand/docs/getting-started/overview", "https://developers.booking.com/demand/docs/development-guide/rate-limiting"]
+  },
+  {
+    "id": "expedia",
+    "title": "Expedia Rapid",
+    "category": "hotel",
+    "confidence": "official-api-docs",
+    "summary": "Partner erişimiyle Shopping ve Price Check; fiyat değişirse yeni tutarı bildirebilir. Gerçek zamanlı veri ücretsiz anonim erişim anlamına gelmez.",
+    "features": ["Shopping", "Price Check", "Rate Changes", "Taxes and Fees"],
+    "technologies": ["Partner REST API"],
+    "links": ["https://developers.expediagroup.com/rapid/lodging/shopping/about-shopping-api", "https://developers.expediagroup.com/rapid/lodging"]
+  }
+]

@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules/
+__pycache__/
+.cache/
+.agents/skills/
+*.sqlite3
+*.log
+source-health.json
+work/
