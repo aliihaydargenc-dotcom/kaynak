@@ -9,3 +9,5 @@ __pycache__/
 *.log
 source-health.json
 work/
+public/
+.next/

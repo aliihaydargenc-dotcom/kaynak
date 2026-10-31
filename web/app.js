@@ -90,5 +90,5 @@ fetch("../data/sources.json", { cache: "no-store" })
     resultCount.textContent = error.message;
     empty.hidden = false;
     empty.querySelector("strong").textContent = "Kaynaklar şu anda görüntülenemiyor.";
-    empty.querySelector("p").textContent = "Sunucuyu depo kökünden açın: python -m http.server 8765";
+    empty.querySelector("p").textContent = "Sorun devam ediyorsa site yöneticisine başvurun.";
   });
