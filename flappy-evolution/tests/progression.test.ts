@@ -189,12 +189,10 @@ describe("save boundary and transactions", () => {
     expect(s.sessionOnly).toBe(false);
     expect(reloaded.commitRun(run()).duplicate).toBe(true);
   });
-  it("rejects insufficient/repeat/unknown purchases and persists settings/selection", () => {
+  it("unlimited coins unlock items with zero balance, reject repeat/unknown items and persist selection", () => {
     const m = new Memory(),
       s = new SaveManager(m);
-    expect(s.buy("leaf")).toBe(false);
-    s.data.wallet.coins = 350;
-    s.write();
+    expect(s.data.wallet.coins).toBe(0);
     expect(s.buy("leaf")).toBe(true);
     expect(s.buy("leaf")).toBe(false);
     expect(s.buy("bad")).toBe(false);
@@ -205,6 +203,8 @@ describe("save boundary and transactions", () => {
     s.setSettings(false, "on");
     const t = new SaveManager(m);
     expect(t.data.inventory.selectedTrail).toBe("leaf");
+    expect(t.buy("star")).toBe(true);
+    expect(t.data.wallet.coins).toBe(0);
     expect(t.data.settings).toEqual({ sound: false, reducedMotion: "on" });
   });
   it("reads latest completed record before reward and responds to external changes", () => {

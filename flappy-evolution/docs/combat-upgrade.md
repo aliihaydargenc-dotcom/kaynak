@@ -36,3 +36,6 @@ Human phone playtesting and full 20-level balance remain necessary; automated co
 ## Validation evidence
 
 36 unit tests passed (combat pool exhaustion/contact idempotence/phase windows/shield reset/character progression, plus existing save and level tests). Chromium fixtures cover a real gate run followed by basic-character boss victory using telegraph-aware input, collision priority, cooldown/projectile freeze on pause, actual cracked-wall destruction, 48 pooled slots and zero voices after mute. Mobile viewport checks additionally assert the top HUD is visible (a focus-induced hidden-parent scroll bug was fixed with overflow: clip). Images: docs/evidence/combat-hud.png and H-flight.png. These are local controlled fixtures, not real phone benchmarks.
+
+## Unlimited wallet (user-requested)
+Menu and wardrobe display ∞. Valid trail purchases no longer require or spend coins, including after reload with an existing zero-balance save. Ownership/duplicate checks remain. Historical numeric earnings remain finite and existing saves require no migration; Infinity is never written to JSON. Flight pickups still count for run stats and adventure star targets.

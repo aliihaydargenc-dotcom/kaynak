@@ -27,7 +27,7 @@ export class MenuScene extends Phaser.Scene {
       ),
       final = (save.data.adventure.levels["4-5"]?.bestStars ?? 0) > 0;
     panel(
-      `<div class="home-top"><span class="wordmark">${icon("wing")} FLAPPY EVOLUTION</span><span class="balance">${icon("coin")}${save.data.wallet.coins}</span></div><div class="hero-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><img src="/icons/hero.svg" alt="Gökyüzünde kanat açan Kıvılcım" width="280" height="180"><span class="hero-tag">${evolution(save.data.xp)} · ${save.data.xp} XP</span></div><h1 class="home-title">Uçuşa başla</h1><div class="mode-cards"><button class="mode-card primary" data-action="adventure" aria-label="Macera">${icon("map")}<span><strong>Macera</strong><small>${stars}/60 yıldız</small></span>${icon("arrow")}</button><button class="mode-card" data-action="endless" aria-label="Sonsuz Uçuş">${icon("infinity")}<span><strong>Sonsuz Uçuş</strong><small>Rekor ${save.data.endless.bestScore}</small></span>${icon("arrow")}</button></div><div class="grid menu-tools">${button("wardrobe", icon("hanger") + " Gardırop")}${button("settings", icon("settings") + " Ayarlar")}</div>${final ? '<p class="final-badge">Evrim Kapısı tamamlandı · Nova rozeti</p>' : ""}${this.notice()}<p id="offline-status" class="notice" role="status"></p><div id="update-slot"></div>`,
+      `<div class="home-top"><span class="wordmark">${icon("wing")} FLAPPY EVOLUTION</span><span class="balance">${icon("coin")}<span aria-label="Sınırsız jeton">∞</span></span></div><div class="hero-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><img src="/icons/hero.svg" alt="Gökyüzünde kanat açan Kıvılcım" width="280" height="180"><span class="hero-tag">${evolution(save.data.xp)} · ${save.data.xp} XP</span></div><h1 class="home-title">Uçuşa başla</h1><div class="mode-cards"><button class="mode-card primary" data-action="adventure" aria-label="Macera">${icon("map")}<span><strong>Macera</strong><small>${stars}/60 yıldız</small></span>${icon("arrow")}</button><button class="mode-card" data-action="endless" aria-label="Sonsuz Uçuş">${icon("infinity")}<span><strong>Sonsuz Uçuş</strong><small>Rekor ${save.data.endless.bestScore}</small></span>${icon("arrow")}</button></div><div class="grid menu-tools">${button("wardrobe", icon("hanger") + " Gardırop")}${button("settings", icon("settings") + " Ayarlar")}</div>${final ? '<p class="final-badge">Evrim Kapısı tamamlandı · Nova rozeti</p>' : ""}${this.notice()}<p id="offline-status" class="notice" role="status"></p><div id="update-slot"></div>`,
       (a) => {
         if (a === "adventure") this.scene.start("WorldMapScene");
         else if (a === "endless")
@@ -53,13 +53,13 @@ export class MenuScene extends Phaser.Scene {
       ).join("")}</div><h2>Uçuş izleri</h2><div class="grid">${Object.entries(
         TRAILS,
       )
-        .map(([id, price]) => {
+        .map(([id]) => {
           const owned = inv.trails.includes(id);
-          return `<button data-action="trail:${id}" aria-pressed="${inv.selectedTrail === id}"><strong>${TRAIL_NAMES[id as keyof typeof TRAIL_NAMES]}</strong><small>${inv.selectedTrail === id ? "Seçili" : owned ? "Seç" : `${price} jeton · Satın al`}</small></button>`;
+          return `<button data-action="trail:${id}" aria-pressed="${inv.selectedTrail === id}"><strong>${TRAIL_NAMES[id as keyof typeof TRAIL_NAMES]}</strong><small>${inv.selectedTrail === id ? "Seçili" : owned ? "Seç" : "Ücretsiz · Aç"}</small></button>`;
         })
         .join(
           "",
-        )}</div><p class="balance">${icon("coin")} ${save.data.wallet.coins} jeton</p>${button("back", "Menüye dön")}${this.notice()}`,
+        )}</div><p class="balance">${icon("coin")} Sınırsız jeton · ∞</p>${button("back", "Menüye dön")}${this.notice()}`,
       (a) => {
         if (a === "back") {
           this.home();
@@ -87,7 +87,7 @@ export class MenuScene extends Phaser.Scene {
         this.wardrobe(
           bought
             ? "Yeni izin gardırobunda hazır."
-            : "Yeterli jeton yok. Uçmaya devam et.",
+            : "Bu iz zaten açık veya kullanılamıyor.",
         );
       }
     } finally {

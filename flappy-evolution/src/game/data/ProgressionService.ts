@@ -76,9 +76,8 @@ export function purchase(data: SaveData, id: string): boolean {
     data.inventory.trails.includes(id)
   )
     return false;
-  const price = TRAILS[id as keyof typeof TRAILS];
-  if (data.wallet.coins < price) return false;
-  data.wallet.coins -= price;
+  // Unlimited wallet: unlock valid items without checking or deducting coins.
+  // Keep finite historical earnings in saves; never serialize Infinity.
   data.inventory.trails.push(id);
   return true;
 }
