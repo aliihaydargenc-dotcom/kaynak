@@ -11,7 +11,6 @@ const paths: Record<string, string> = {
   settings:
     "M12 8a4 4 0 100 8 4 4 0 000-8zm0-6v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10l2 2M5 19l2-2M17 7l2-2",
   arrow: "M4 12h16m-6-6l6 6-6 6",
-  coin: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 5v8m-3-4h6",
 };
 export function icon(name: string): string {
   return `<svg aria-hidden="true" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${paths[name] ?? paths.wing}"/></svg>`;

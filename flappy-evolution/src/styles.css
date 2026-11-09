@@ -622,20 +622,6 @@ section > button {
   line-height: 1.15;
   -webkit-text-stroke: 1px #305464;
 }
-.coin-pill {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: #ffde8e;
-  background: #173e50bb;
-  border: 1px solid #c3e0cc88;
-  border-radius: 24px;
-  padding: 8px 10px;
-  font-size: 14px;
-}
-.coin-pill .icon {
-  width: 18px;
-}
 .hud button {
   pointer-events: auto;
 }

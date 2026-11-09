@@ -84,27 +84,8 @@ export class AssetFactory {
       c.fillStyle = "#ffd9a0";
       this.star(c, 21, 38, 8, 4);
     });
-    make("coin", 64, 64, (c) => {
-      c.fillStyle = "#8a522e";
-      c.beginPath();
-      c.arc(32, 34, 28, 0, 7);
-      c.fill();
-      const g = c.createLinearGradient(10, 4, 48, 54);
-      g.addColorStop(0, "#fff2b6");
-      g.addColorStop(1, "#eab55e");
-      c.fillStyle = g;
-      c.beginPath();
-      c.arc(32, 30, 27, 0, 7);
-      c.fill();
-      c.strokeStyle = "#9e6635";
-      c.lineWidth = 3;
-      c.beginPath();
-      c.arc(32, 30, 19, 0, 7);
-      c.stroke();
-      c.fillStyle = "#8a522e";
-      this.star(c, 32, 30, 12, 6);
-    });
   }
+
   private static star(
     c: CanvasRenderingContext2D,
     x: number,

@@ -35,7 +35,7 @@ export class MenuScene extends Phaser.Scene {
       ),
       final = (save.data.adventure.levels["4-5"]?.bestStars ?? 0) > 0;
     panel(
-      `<div class="game-home"><div class="home-top"><span class="edition">BİR KANAT. BİN MACERA.</span><span class="balance">${icon("coin")} ∞</span></div><h1 class="game-logo"><span>FLAPPY</span><strong>EVOLUTION</strong></h1><div class="hero-space" aria-label="${character(save.data.inventory.selectedSkin).label} uçuyor"><span class="hero-caption">${character(save.data.inventory.selectedSkin).label} <i>•</i> ${save.data.xp} XP</span></div><div class="home-actions"><p class="journey-label">Gökyüzü seni bekliyor</p><button class="mode-launch adventure-launch" data-action="adventure" aria-label="Macera">${icon("map")}<span><strong>Macera</strong><small>4 dünya keşfet · ${stars}/60 ★</small></span>${icon("arrow")}</button><button class="mode-launch endless-launch" data-action="endless" aria-label="Sonsuz Uçuş">${icon("infinity")}<span><strong>Sonsuz Uçuş</strong><small>Kendi rekorunu aş · ${save.data.endless.bestScore}</small></span>${icon("arrow")}</button><div class="menu-tools">${button("wardrobe", icon("hanger") + " Gardırop")}${button("settings", icon("settings") + " Ayarlar")}</div>${final ? '<p class="final-badge">Evrim Kapısı tamamlandı · Nova rozeti</p>' : ""}${this.notice()}<p id="offline-status" class="notice" role="status"></p><div id="update-slot"></div></div></div>`,
+      `<div class="game-home"><div class="home-top"><span class="edition">BİR KANAT. BİN MACERA.</span></div><h1 class="game-logo"><span>FLAPPY</span><strong>EVOLUTION</strong></h1><div class="hero-space" aria-label="${character(save.data.inventory.selectedSkin).label} uçuyor"><span class="hero-caption">${character(save.data.inventory.selectedSkin).label} <i>•</i> ${save.data.xp} XP</span></div><div class="home-actions"><p class="journey-label">Gökyüzü seni bekliyor</p><button class="mode-launch adventure-launch" data-action="adventure" aria-label="Macera">${icon("map")}<span><strong>Macera</strong><small>4 dünya keşfet · ${stars}/60 ★</small></span>${icon("arrow")}</button><button class="mode-launch endless-launch" data-action="endless" aria-label="Sonsuz Uçuş">${icon("infinity")}<span><strong>Sonsuz Uçuş</strong><small>Kendi rekorunu aş · ${save.data.endless.bestScore}</small></span>${icon("arrow")}</button><div class="menu-tools">${button("wardrobe", icon("hanger") + " Gardırop")}${button("settings", icon("settings") + " Ayarlar")}</div>${final ? '<p class="final-badge">Evrim Kapısı tamamlandı · Nova rozeti</p>' : ""}${this.notice()}<p id="offline-status" class="notice" role="status"></p><div id="update-slot"></div></div></div>`,
       (a) => {
         if (a === "adventure") this.scene.start("WorldMapScene");
         else if (a === "endless")
@@ -80,9 +80,7 @@ export class MenuScene extends Phaser.Scene {
           const owned = inv.trails.includes(id);
           return `<button data-action="trail:${id}" aria-pressed="${inv.selectedTrail === id}"><strong>${TRAIL_NAMES[id as keyof typeof TRAIL_NAMES]}</strong><small>${inv.selectedTrail === id ? "Seçili" : owned ? "Seç" : "Ücretsiz · Aç"}</small></button>`;
         })
-        .join(
-          "",
-        )}</div><p class="balance">${icon("coin")} Sınırsız jeton · ∞</p>${button("back", "Menüye dön")}${this.notice()}`,
+        .join("")}</div>${button("back", "Menüye dön")}${this.notice()}`,
       (a) => {
         if (a === "back") {
           this.home();

@@ -26,7 +26,6 @@ export class DifficultyDirector {
       spawnDelay: Math.round(Phaser.Math.Linear(1650, 910, intensity)),
       swayChance: Phaser.Math.Linear(0.16, 0.45, intensity),
       pulseChance: Phaser.Math.Linear(0.07, 0.28, intensity),
-      coinChance: Phaser.Math.Linear(0.46, 0.58, intensity),
       windChance: Phaser.Math.Linear(0.05, 0.34, intensity),
     };
   }

@@ -8,7 +8,7 @@ export const BIRD_GRAVITY = 1650;
 export const STORAGE_KEY = "flappy_evolution_save_v1";
 export const SKINS = ["spark", "sprout", "dune", "crystal", "nova"] as const;
 export const SKIN_NAMES = ["Kıvılcım", "Filiz", "Kumul", "Kristal", "Nova"];
-export const TRAILS = { none: 0, leaf: 100, sand: 250, star: 500 } as const;
+export const TRAILS = { none: 0, leaf: 0, sand: 0, star: 0 } as const;
 export const TRAIL_NAMES = {
   none: "İz yok",
   leaf: "Yaprak",

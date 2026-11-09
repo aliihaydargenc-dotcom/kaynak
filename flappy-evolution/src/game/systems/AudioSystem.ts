@@ -3,21 +3,16 @@ import { ZZFX } from "../../vendor/zzfx.js";
 type Cue =
   | "flap"
   | "score"
-  | "coin"
   | "hit"
   | "unlock"
   | "fire"
   | "break"
   | "boss"
   | "warning";
-// Original ZzFX recipes. Coin notes are B5 (987.77 Hz) → E6 (1318.51 Hz).
+// Original ZzFX recipes.
 const recipes: Record<Cue, number[][]> = {
   flap: [[0.72, 0, 780, 0.002, 0.018, 0.115, 0, 1, -5]],
   score: [[0.16, 0, 660, 0.003, 0.02, 0.08, 0]],
-  coin: [
-    [0.34, 0, 987.77, 0.003, 0.025, 0.09, 1],
-    [0.28, 0, 1318.51, 0.003, 0.035, 0.18, 1],
-  ],
   hit: [[0.55, 0, 110, 0.002, 0.08, 0.25, 3, 1, -1]],
   unlock: [
     [0.3, 0, 523.25, 0.008, 0.08, 0.3, 1],
@@ -91,9 +86,6 @@ export class AudioSystem {
   score(): void {
     this.play("score", 1);
   }
-  coin(): void {
-    this.play("coin", 2);
-  }
   hit(): void {
     this.play("hit", 3);
   }
@@ -144,9 +136,7 @@ export class AudioSystem {
         this.voices.delete(source);
         this.flightVoices.delete(source);
       };
-      source.start(
-        this.context!.currentTime + index * (cue === "coin" ? 0.065 : 0.1),
-      );
+      source.start(this.context!.currentTime + index * 0.1);
     });
   }
   stop(): void {

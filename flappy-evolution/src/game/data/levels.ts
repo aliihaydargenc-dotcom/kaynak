@@ -10,8 +10,6 @@ export interface Level {
   interval: number;
   swayEvery: number;
   pulseEvery: number;
-  coins: number;
-  reward: number;
   seed: string;
 }
 export const WORLDS = [
@@ -32,8 +30,6 @@ export const LEVELS: Level[] = [
     interval: 1650,
     swayEvery: 0,
     pulseEvery: 0,
-    coins: 2,
-    reward: 20,
     seed: "adventure:1-1:v1",
   },
   {
@@ -47,8 +43,6 @@ export const LEVELS: Level[] = [
     interval: 1650,
     swayEvery: 0,
     pulseEvery: 0,
-    coins: 2,
-    reward: 20,
     seed: "adventure:1-2:v1",
   },
   {
@@ -62,8 +56,6 @@ export const LEVELS: Level[] = [
     interval: 1600,
     swayEvery: 0,
     pulseEvery: 0,
-    coins: 3,
-    reward: 20,
     seed: "adventure:1-3:v1",
   },
   {
@@ -77,8 +69,6 @@ export const LEVELS: Level[] = [
     interval: 1600,
     swayEvery: 0,
     pulseEvery: 0,
-    coins: 3,
-    reward: 20,
     seed: "adventure:1-4:v1",
   },
   {
@@ -92,8 +82,6 @@ export const LEVELS: Level[] = [
     interval: 1550,
     swayEvery: 0,
     pulseEvery: 0,
-    coins: 4,
-    reward: 20,
     seed: "adventure:1-5:v1",
   },
   {
@@ -107,8 +95,6 @@ export const LEVELS: Level[] = [
     interval: 1550,
     swayEvery: 4,
     pulseEvery: 0,
-    coins: 3,
-    reward: 30,
     seed: "adventure:2-1:v1",
   },
   {
@@ -122,8 +108,6 @@ export const LEVELS: Level[] = [
     interval: 1500,
     swayEvery: 4,
     pulseEvery: 0,
-    coins: 4,
-    reward: 30,
     seed: "adventure:2-2:v1",
   },
   {
@@ -137,8 +121,6 @@ export const LEVELS: Level[] = [
     interval: 1500,
     swayEvery: 3,
     pulseEvery: 0,
-    coins: 4,
-    reward: 30,
     seed: "adventure:2-3:v1",
   },
   {
@@ -152,8 +134,6 @@ export const LEVELS: Level[] = [
     interval: 1450,
     swayEvery: 3,
     pulseEvery: 0,
-    coins: 5,
-    reward: 30,
     seed: "adventure:2-4:v1",
   },
   {
@@ -167,8 +147,6 @@ export const LEVELS: Level[] = [
     interval: 1450,
     swayEvery: 2,
     pulseEvery: 0,
-    coins: 5,
-    reward: 30,
     seed: "adventure:2-5:v1",
   },
   {
@@ -182,8 +160,6 @@ export const LEVELS: Level[] = [
     interval: 1450,
     swayEvery: 0,
     pulseEvery: 4,
-    coins: 4,
-    reward: 40,
     seed: "adventure:3-1:v1",
   },
   {
@@ -197,8 +173,6 @@ export const LEVELS: Level[] = [
     interval: 1400,
     swayEvery: 0,
     pulseEvery: 3,
-    coins: 5,
-    reward: 40,
     seed: "adventure:3-2:v1",
   },
   {
@@ -212,8 +186,6 @@ export const LEVELS: Level[] = [
     interval: 1400,
     swayEvery: 4,
     pulseEvery: 3,
-    coins: 5,
-    reward: 40,
     seed: "adventure:3-3:v1",
   },
   {
@@ -227,8 +199,6 @@ export const LEVELS: Level[] = [
     interval: 1350,
     swayEvery: 0,
     pulseEvery: 2,
-    coins: 6,
-    reward: 40,
     seed: "adventure:3-4:v1",
   },
   {
@@ -242,8 +212,6 @@ export const LEVELS: Level[] = [
     interval: 1350,
     swayEvery: 3,
     pulseEvery: 2,
-    coins: 6,
-    reward: 40,
     seed: "adventure:3-5:v1",
   },
   {
@@ -257,8 +225,6 @@ export const LEVELS: Level[] = [
     interval: 1350,
     swayEvery: 0,
     pulseEvery: 0,
-    coins: 6,
-    reward: 50,
     seed: "adventure:4-1:v1",
   },
   {
@@ -272,8 +238,6 @@ export const LEVELS: Level[] = [
     interval: 1300,
     swayEvery: 4,
     pulseEvery: 0,
-    coins: 6,
-    reward: 50,
     seed: "adventure:4-2:v1",
   },
   {
@@ -287,8 +251,6 @@ export const LEVELS: Level[] = [
     interval: 1300,
     swayEvery: 0,
     pulseEvery: 4,
-    coins: 7,
-    reward: 50,
     seed: "adventure:4-3:v1",
   },
   {
@@ -302,8 +264,6 @@ export const LEVELS: Level[] = [
     interval: 1250,
     swayEvery: 3,
     pulseEvery: 2,
-    coins: 7,
-    reward: 50,
     seed: "adventure:4-4:v1",
   },
   {
@@ -317,8 +277,6 @@ export const LEVELS: Level[] = [
     interval: 1250,
     swayEvery: 3,
     pulseEvery: 2,
-    coins: 8,
-    reward: 50,
     seed: "adventure:4-5:v1",
   },
 ];
@@ -392,12 +350,6 @@ export function validateCatalog(levels: Level[]): string[] {
       l.order > 5
     )
       errors.push(`Geçersiz dünya/sıra: ${l.id}`);
-    if (
-      !Number.isInteger(l.coins) ||
-      l.coins < 0 ||
-      l.coins > Math.floor(l.gates / 2)
-    )
-      errors.push(`Erişilemez jeton hedefi: ${l.id}`);
     if (
       !Number.isInteger(l.gates) ||
       l.gates < 1 ||

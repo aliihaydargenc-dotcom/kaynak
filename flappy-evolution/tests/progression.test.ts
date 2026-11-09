@@ -20,9 +20,7 @@ const run = (extra: Partial<RunSummary> = {}): RunSummary => ({
   outcome: "won",
   score: 8,
   passedGates: 8,
-  pickupCoins: 2,
-  bonusCoins: 1,
-  nearMisses: 1,
+  nearMisses: 0,
   allPassesCentered: true,
   activeDurationMs: 16000,
   ...extra,
@@ -41,40 +39,41 @@ class Memory implements StoragePort {
   }
 }
 describe("rewards", () => {
-  it("snapshots tier multiplier once without multiplying clear bonus or star pickups", () => {
+  it("rewards XP without changing historical balances or creating coin rewards", () => {
     const s = defaults();
-    const result = applyRun(s, run({ characterId: "nova" }));
-    expect(result.coins).toBe(35);
-    expect(result.stars).toBe(3);
-    expect(applyRun(s, run({ characterId: "nova" })).coins).toBe(0);
-    expect(
-      applyRun(defaults(), run({ outcome: "dead", characterId: "crystal" }))
-        .coins,
-    ).toBe(12);
+    s.wallet.coins = 123;
+    const reward = applyRun(s, run({ characterId: "nova" }));
+    expect(reward).not.toHaveProperty("coins");
+    expect(s.wallet.coins).toBe(123);
+    expect(reward.xp).toBe(75);
+    expect(applyRun(s, run()).duplicate).toBe(true);
   });
-  it("stars use physical coins and completed gate count, never bonus score", () => {
+  it("awards stars for completion, safe flight and centered passes", () => {
     expect(starsFor(run())).toBe(3);
     expect(starsFor(run({ allPassesCentered: false }))).toBe(2);
-    expect(starsFor(run({ pickupCoins: 1, bonusCoins: 99 }))).toBe(1);
+    expect(starsFor(run({ allPassesCentered: false, nearMisses: 2 }))).toBe(1);
     expect(starsFor(run({ passedGates: 7, score: 99 }))).toBe(0);
     expect(starsFor(run({ outcome: "dead" }))).toBe(0);
   });
   it("first clear once, star differences only, lower replay cannot lose progress", () => {
     const s = defaults();
-    expect(applyRun(s, run())).toMatchObject({ stars: 3, coins: 23, xp: 75 });
+    expect(applyRun(s, run())).toMatchObject({ stars: 3, xp: 75 });
     expect(applyRun(s, run()).duplicate).toBe(true);
-    const replay = applyRun(s, run({ runId: "run-2", pickupCoins: 0 }));
-    expect(replay).toMatchObject({ stars: 1, coins: 1, xp: 0 });
+    const replay = applyRun(
+      s,
+      run({ runId: "run-2", allPassesCentered: false, nearMisses: 2 }),
+    );
+    expect(replay).toMatchObject({ stars: 1, xp: 0 });
     expect(s.adventure.levels["1-1"].bestStars).toBe(3);
     expect(s.xp).toBe(75);
     const t = defaults();
-    applyRun(t, run({ pickupCoins: 0 }));
+    applyRun(t, run({ allPassesCentered: false, nearMisses: 2 }));
     expect(applyRun(t, run({ runId: "new" })).xp).toBe(50);
   });
-  it("keeps loss coins and separate endless scores/XP, preserves tied runs", () => {
+  it("keeps legacy balances unchanged and separate endless scores/XP, preserves tied runs", () => {
     const s = defaults();
     applyRun(s, run({ outcome: "dead" }));
-    expect(s.wallet.coins).toBe(3);
+    expect(s.wallet.coins).toBe(0);
     expect(s.xp).toBe(0);
     applyRun(
       s,
@@ -98,7 +97,6 @@ describe("rewards", () => {
           runId: l.id,
           levelId: l.id,
           passedGates: l.gates,
-          pickupCoins: l.coins,
         }),
       );
     expect(s.inventory.skins).toEqual([
@@ -179,18 +177,19 @@ describe("save boundary and transactions", () => {
     m.failRead = false;
     m.failWrite = true;
     s.commitRun(run());
-    expect(s.data.wallet.coins).toBe(23);
+    expect(s.data.wallet.coins).toBe(0);
     expect(s.sessionOnly).toBe(true);
     s.commitRun(run());
-    expect(s.data.wallet.coins).toBe(23);
+    expect(s.data.wallet.coins).toBe(0);
     m.failWrite = false;
     s.write();
     const reloaded = new SaveManager(m);
-    expect(reloaded.data.wallet.coins).toBe(23);
+    expect(reloaded.data.wallet.coins).toBe(0);
+    expect(reloaded.data.xp).toBe(75);
     expect(s.sessionOnly).toBe(false);
     expect(reloaded.commitRun(run()).duplicate).toBe(true);
   });
-  it("unlimited coins unlock items with zero balance, reject repeat/unknown items and persist selection", () => {
+  it("free trails unlock with zero legacy balance, reject repeat/unknown items and persist selection", () => {
     const m = new Memory(),
       s = new SaveManager(m);
     expect(s.data.wallet.coins).toBe(0);
@@ -214,16 +213,17 @@ describe("save boundary and transactions", () => {
       b = new SaveManager(m);
     a.commitRun(run());
     b.commitRun(run({ runId: "two", outcome: "dead" }));
-    expect(b.data.wallet.coins).toBe(26);
+    expect(b.data.wallet.coins).toBe(0);
     a.externalChange();
-    expect(a.data.wallet.coins).toBe(26);
+    expect(a.data.wallet.coins).toBe(0);
+    expect(a.data.xp).toBe(75);
   });
   it("preserves unknown future schema bytes while allowing session play", () => {
     const m = new Memory();
     m.value = '{"schemaVersion":99,"future":"keep"}';
     const s = new SaveManager(m);
     s.commitRun(run());
-    expect(s.data.wallet.coins).toBe(23);
+    expect(s.data.wallet.coins).toBe(0);
     expect(s.sessionOnly).toBe(true);
     expect(m.value).toBe('{"schemaVersion":99,"future":"keep"}');
   });
@@ -231,11 +231,14 @@ describe("save boundary and transactions", () => {
 
 it("all characters can be selected and persist on fresh and old saves", () => {
   const m = new Memory();
-  m.value = JSON.stringify({...defaults(), inventory: {...defaults().inventory, skins: ['spark']}});
+  m.value = JSON.stringify({
+    ...defaults(),
+    inventory: { ...defaults().inventory, skins: ["spark"] },
+  });
   for (const id of SKINS) {
     const s = new SaveManager(m);
-    expect(s.select('skin', id)).toBe(true);
+    expect(s.select("skin", id)).toBe(true);
     expect(new SaveManager(m).data.inventory.selectedSkin).toBe(id);
   }
-  expect(new SaveManager(m).select('skin', 'unknown')).toBe(false);
+  expect(new SaveManager(m).select("skin", "unknown")).toBe(false);
 });

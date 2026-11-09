@@ -57,7 +57,7 @@ test("single input, pause clocks, countdown, ten restarts and sealed results", a
     s.flap();
     for (let i = 0; i < 150; i++)
       g.headlessStep(500 + (i * 1000) / 60, 1000 / 60);
-    const before = [s.score, s.pickupCoins, s.bonusCoins, s.activeMs],
+    const before = [s.score, s.passedGates, s.nearMisses, s.activeMs],
       summary = s.summary;
     s.finishRun("dead");
     for (let i = 0; i < 60; i++)
@@ -66,7 +66,7 @@ test("single input, pause clocks, countdown, ten restarts and sealed results", a
       listeners,
       phase: s.phase,
       before,
-      after: [s.score, s.pickupCoins, s.bonusCoins, s.activeMs],
+      after: [s.score, s.passedGates, s.nearMisses, s.activeMs],
       sameSummary: s.summary === summary,
     };
   });

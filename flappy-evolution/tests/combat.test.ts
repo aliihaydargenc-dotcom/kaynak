@@ -6,9 +6,7 @@ describe("character and combat contracts", () => {
     expect(character("unknown").tier).toBe(1);
     CHARACTERS.slice(1).forEach((c, i) => {
       const prev = CHARACTERS[i];
-      expect(c.multiplier).toBeGreaterThan(prev.multiplier);
       expect(c.damage).toBeGreaterThanOrEqual(prev.damage);
-      expect(c.magnet).toBeGreaterThanOrEqual(prev.magnet);
       expect(c.shield).toBeGreaterThanOrEqual(prev.shield);
       expect(c.cooldown).toBeLessThan(prev.cooldown);
     });

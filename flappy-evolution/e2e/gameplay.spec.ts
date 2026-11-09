@@ -37,7 +37,7 @@ test("fixed input matches upstream Bird position/velocity in the actual Arcade e
     expect(samples[i].vy).toBeCloseTo(baseline.samples[i].vy, 4);
   }
 });
-test("adventure win, physical coins, next level and loss/retry use one core", async ({
+test("adventure win, next level and loss/retry use one core", async ({
   page,
 }) => {
   await page.goto("/?canvas&debug&timer");
@@ -104,7 +104,7 @@ test("adventure win, physical coins, next level and loss/retry use one core", as
     page.getByRole("button", { name: /1-2 Yaprak Arası/ }),
   ).toBeEnabled();
 });
-test("collision wins over same-frame final gate and no coins awarded on death frame", async ({
+test("collision wins over same-frame final gate without final-gate rewards", async ({
   page,
 }) => {
   await page.goto("/?canvas&debug&timer");

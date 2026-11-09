@@ -1,4 +1,3 @@
-import { character } from "./characters";
 import { SKINS, TRAILS } from "../constants";
 import { getLevel } from "./levels";
 import type { RunSummary, SaveData } from "../types";
@@ -9,7 +8,7 @@ export function starsFor(s: Readonly<RunSummary>): number {
   const l =
     s.mode === "adventure" && s.levelId ? getLevel(s.levelId) : undefined;
   if (!l || s.outcome !== "won" || s.passedGates < l.gates) return 0;
-  return s.pickupCoins < l.coins ? 1 : s.allPassesCentered ? 3 : 2;
+  return s.allPassesCentered ? 3 : s.nearMisses === 0 ? 2 : 1;
 }
 export function evolution(xp: number): string {
   return xp >= 3000
@@ -22,20 +21,15 @@ export function evolution(xp: number): string {
 }
 export interface Reward {
   stars: number;
-  coins: number;
   xp: number;
   duplicate?: boolean;
   skin?: string;
 }
 export function applyRun(data: SaveData, s: Readonly<RunSummary>): Reward {
   if (data.processedRunIds.includes(s.runId))
-    return { stars: 0, coins: 0, xp: 0, duplicate: true };
+    return { stars: 0, xp: 0, duplicate: true };
   const stars = starsFor(s);
-  let coins = bounded(
-      (s.pickupCoins + s.bonusCoins) *
-        character(s.characterId ?? "spark").multiplier,
-    ),
-    xp = 0,
+  let xp = 0,
     skin: string | undefined;
   if (s.mode === "adventure" && s.levelId) {
     const l = getLevel(s.levelId);
@@ -46,7 +40,6 @@ export function applyRun(data: SaveData, s: Readonly<RunSummary>): Reward {
         firstClearClaimed: false,
       };
       xp = 25 * Math.max(0, stars - old.bestStars);
-      if (stars > 0 && !old.firstClearClaimed) coins += l.reward;
       data.adventure.levels[l.id] = {
         bestStars: Math.max(old.bestStars, stars),
         bestScore: Math.max(old.bestScore, bounded(s.score)),
@@ -65,10 +58,9 @@ export function applyRun(data: SaveData, s: Readonly<RunSummary>): Reward {
       .sort((a, b) => b - a)
       .slice(0, 10);
   }
-  data.wallet.coins = bounded(data.wallet.coins + coins);
   data.xp = bounded(data.xp + xp);
   data.processedRunIds = [...data.processedRunIds, s.runId].slice(-100);
-  return { stars, coins, xp, skin };
+  return { stars, xp, skin };
 }
 export function purchase(data: SaveData, id: string): boolean {
   if (
@@ -76,8 +68,7 @@ export function purchase(data: SaveData, id: string): boolean {
     data.inventory.trails.includes(id)
   )
     return false;
-  // Unlimited wallet: unlock valid items without checking or deducting coins.
-  // Keep finite historical earnings in saves; never serialize Infinity.
+  // Trails remain freely available; legacy balances have no gameplay role.
   data.inventory.trails.push(id);
   return true;
 }

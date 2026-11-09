@@ -8,9 +8,8 @@ import {
 } from "../src/game/data/levels";
 import { defaults } from "../src/game/data/SaveManager";
 describe("adventure catalog", () => {
-  it("has the documented twenty slots, attainable coins and 700 first-clear coins", () => {
+  it("has the documented twenty slots across four worlds", () => {
     expect(validateCatalog(LEVELS)).toEqual([]);
-    expect(LEVELS.reduce((s, l) => s + l.reward, 0)).toBe(700);
     for (let w = 1; w <= 4; w++)
       expect(LEVELS.filter((l) => l.world === w)).toHaveLength(5);
   });
@@ -18,16 +17,13 @@ describe("adventure catalog", () => {
     expect(
       validateCatalog([
         ...LEVELS.slice(0, 19),
-        { ...LEVELS[0], coins: 999 },
+        { ...LEVELS[0], gates: 0 },
       ]).join(),
     ).toMatch(/Tekrarlanan/);
     expect(validateCatalog(LEVELS.slice(1)).join()).toMatch(/Eksik/);
     expect(
-      validateCatalog([
-        { ...LEVELS[0], coins: 999 },
-        ...LEVELS.slice(1),
-      ]).join(),
-    ).toMatch(/jeton/);
+      validateCatalog([{ ...LEVELS[0], gates: 0 }, ...LEVELS.slice(1)]).join(),
+    ).toMatch(/profil/);
   });
   it("keeps all movement inside safe edges, bounded center changes and seeded phases", () => {
     for (const l of LEVELS) {

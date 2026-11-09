@@ -31,8 +31,6 @@ export class PlayScene extends Phaser.Scene {
   public activeMs = 0;
   public score = 0;
   public passedGates = 0;
-  public pickupCoins = 0;
-  public bonusCoins = 0;
   public nearMisses = 0;
   public allPassesCentered = true;
   public request!: RunRequest;
@@ -87,8 +85,6 @@ export class PlayScene extends Phaser.Scene {
     this.activeMs = 0;
     this.score = 0;
     this.passedGates = 0;
-    this.pickupCoins = 0;
-    this.bonusCoins = 0;
     this.nearMisses = 0;
     this.allPassesCentered = true;
     this.summary = null;
@@ -178,7 +174,6 @@ export class PlayScene extends Phaser.Scene {
           spawnDelay: this.level.interval,
           swayChance: 0,
           pulseChance: 0,
-          coinChance: 0,
           windChance: 0,
         }
       : this.director.update(delta, this.score);
@@ -351,41 +346,6 @@ export class PlayScene extends Phaser.Scene {
   }
   private collectRewards(): void {
     for (const p of this.obstacles.pairs) {
-      if (p.coin) {
-        if (
-          this.power.magnet &&
-          Phaser.Math.Distance.Between(
-            this.bird.x,
-            this.bird.y,
-            p.coin.x,
-            p.coin.y,
-          ) <= this.power.magnet
-        ) {
-          this.pickupCoins++;
-          this.audioSystem.coin();
-          this.burst(p.coin.x, p.coin.y, 0xf4ca75, 8);
-          p.coin.destroy();
-          p.coin = undefined;
-        }
-      }
-      if (p.coin) {
-        const b = p.coin.getBounds();
-        const r = new Phaser.Geom.Rectangle(
-          b.x + 12,
-          b.y + 12,
-          b.width - 24,
-          b.height - 24,
-        );
-        if (
-          Phaser.Geom.Intersects.RectangleToRectangle(this.bird.getHitbox(), r)
-        ) {
-          this.pickupCoins++;
-          this.audioSystem.coin();
-          this.burst(p.coin.x, p.coin.y, 0xf4ca75, 8);
-          p.coin.destroy();
-          p.coin = undefined;
-        }
-      }
       if (!p.scored && p.x < this.bird.x - 24) {
         p.scored = true;
         this.passedGates++;
@@ -397,7 +357,6 @@ export class PlayScene extends Phaser.Scene {
         if (p.currentGap * 0.5 - distance < 18) {
           this.nearMisses++;
           this.score++;
-          this.bonusCoins++;
         }
       }
     }
@@ -575,8 +534,6 @@ export class PlayScene extends Phaser.Scene {
       outcome,
       score: this.score,
       passedGates: this.passedGates,
-      pickupCoins: this.pickupCoins,
-      bonusCoins: this.bonusCoins,
       nearMisses: this.nearMisses,
       characterId: this.power.id,
       allPassesCentered: this.allPassesCentered,
@@ -587,7 +544,7 @@ export class PlayScene extends Phaser.Scene {
     this.combatView.render(this.bird.x, this.bird.y, this.reducedMotion());
     this.phase = "results";
     panel(
-      `<div class="result-emblem" aria-hidden="true">${icon(outcome === "won" ? "wing" : "infinity")}</div><p class="eyebrow">${this.level ? `${this.level.id} · ${this.level.name}` : "Sonsuz Uçuş"}</p><h1>${outcome === "won" ? "Bölüm tamamlandı" : "Uçuş bitti"}</h1><div class="stars" aria-label="${reward.stars} yıldız">${"★".repeat(reward.stars)}${"☆".repeat(3 - reward.stars)}</div><div class="result-stats"><strong>${this.score}<small>skor</small></strong><strong>+${reward.coins}<small>jeton</small></strong><strong>+${reward.xp}<small>XP</small></strong></div><p>${this.passedGates} geçiş · ${this.pickupCoins} jeton · ${this.nearMisses} yakın geçiş</p>${this.level ? (outcome === "won" && this.level.id !== "4-5" ? button("next", "Sonraki bölüm", true) : "") : ""}${button("retry", "Tekrar dene", !this.level || outcome === "dead")}${button("menu", "Menüye dön")}<p class="notice">${save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : ""}</p>`,
+      `<div class="result-emblem" aria-hidden="true">${icon(outcome === "won" ? "wing" : "infinity")}</div><p class="eyebrow">${this.level ? `${this.level.id} · ${this.level.name}` : "Sonsuz Uçuş"}</p><h1>${outcome === "won" ? "Bölüm tamamlandı" : "Uçuş bitti"}</h1><div class="stars" aria-label="${reward.stars} yıldız">${"★".repeat(reward.stars)}${"☆".repeat(3 - reward.stars)}</div><div class="result-stats"><strong>${this.score}<small>skor</small></strong><strong>+${reward.xp}<small>XP</small></strong></div><p>${this.passedGates} geçiş · ${this.nearMisses} yakın geçiş</p>${this.level ? (outcome === "won" && this.level.id !== "4-5" ? button("next", "Sonraki bölüm", true) : "") : ""}${button("retry", "Tekrar dene", !this.level || outcome === "dead")}${button("menu", "Menüye dön")}<p class="notice">${save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : ""}</p>`,
       (a) => {
         if (a === "retry") void startRun(this, this.request);
         else if (a === "next" && this.level) {
@@ -619,8 +576,7 @@ export class PlayScene extends Phaser.Scene {
     const cooldown = Math.round(
       100 * (1 - this.combat.cooldown / this.power.cooldown),
     );
-    const coins = (this.pickupCoins + this.bonusCoins) * this.power.multiplier;
-    const text = `${this.score}:${coins}:${boss?.hp}:${boss?.phase}:${boss?.state}:${this.combat.shields}:${cooldown}:${save.data.settings.sound}`;
+    const text = `${this.score}:${boss?.hp}:${boss?.phase}:${boss?.state}:${this.combat.shields}:${cooldown}:${save.data.settings.sound}`;
     if (text === this.lastHud) return;
     if (text === this.lastHud) return;
     // Preserve DOM nodes while the counter and cooldown change: keyboard focus and pointer targets stay stable.
@@ -635,7 +591,6 @@ export class PlayScene extends Phaser.Scene {
           this.level ? `${this.passedGates}/${this.level.gates}` : this.score,
         ),
       );
-      set("run-coins", String(coins));
       set("shield-count", String(this.combat.shields));
       set(
         "boss-name",
@@ -675,18 +630,12 @@ export class PlayScene extends Phaser.Scene {
             ? "Ateş et"
             : `${(this.combat.cooldown / 1000).toFixed(1)}s`,
       );
-      if (coins !== Number(this.lastHud.split(":")[1]) && !this.reducedMotion())
-        document
-          .getElementById("run-coins")
-          ?.animate([{ transform: "scale(1.3)" }, { transform: "scale(1)" }], {
-            duration: 200,
-          });
       this.lastHud = text;
       return;
     }
     this.lastHud = text;
     hud(
-      `<div id="flight-hud"><div class="flight-top glass"><div class="flight-score"><small>${this.level ? this.level.id + " · " + this.level.name : "SONSUZ UÇUŞ"}</small><strong id="run-score">${this.level ? `${this.passedGates}/${this.level.gates}` : this.score}</strong></div><div class="coin-pill">${icon("coin")}<b id="run-coins">${coins}</b></div><button data-action="sound" class="hud-icon" aria-label="${save.data.settings.sound ? "Ses açık" : "Ses kapalı"}">${icon(save.data.settings.sound ? "sound" : "muted")}</button><button data-action="pause" class="hud-icon" aria-label="Duraklat">${icon("pause")}</button></div><div id="boss-panel" class="boss-panel glass" ${boss ? "" : "hidden"}><div><strong id="boss-name">${boss?.definition.name ?? ""}</strong><span id="boss-warning"></span></div><progress id="boss-hp" aria-label="Boss canı" max="${boss?.maxHealth ?? 1}" value="${boss?.hp ?? 0}"></progress></div><div class="flight-bottom"><div class="power-chip glass">${icon("shield")}<span><b>${this.power.label} · K${this.power.tier}</b><small>Kalkan <span id="shield-count">${this.combat.shields}</span> · ${this.power.multiplier}× jeton</small></span></div><button data-action="fire" class="fire-control" style="--charge:${cooldown}%" aria-label="Ateş et" ${!canFire || !ready ? "disabled" : ""}>${icon("fire")}<span id="fire-label">${canFire ? "Ateş et" : "Kademe 3"}</span><kbd>F</kbd></button></div></div>`,
+      `<div id="flight-hud"><div class="flight-top glass"><div class="flight-score"><small>${this.level ? this.level.id + " · " + this.level.name : "SONSUZ UÇUŞ"}</small><strong id="run-score">${this.level ? `${this.passedGates}/${this.level.gates}` : this.score}</strong></div><button data-action="sound" class="hud-icon" aria-label="${save.data.settings.sound ? "Ses açık" : "Ses kapalı"}">${icon(save.data.settings.sound ? "sound" : "muted")}</button><button data-action="pause" class="hud-icon" aria-label="Duraklat">${icon("pause")}</button></div><div id="boss-panel" class="boss-panel glass" ${boss ? "" : "hidden"}><div><strong id="boss-name">${boss?.definition.name ?? ""}</strong><span id="boss-warning"></span></div><progress id="boss-hp" aria-label="Boss canı" max="${boss?.maxHealth ?? 1}" value="${boss?.hp ?? 0}"></progress></div><div class="flight-bottom"><div class="power-chip glass">${icon("shield")}<span><b>${this.power.label} · K${this.power.tier}</b><small>Kalkan <span id="shield-count">${this.combat.shields}</span></small></span></div><button data-action="fire" class="fire-control" style="--charge:${cooldown}%" aria-label="Ateş et" ${!canFire || !ready ? "disabled" : ""}>${icon("fire")}<span id="fire-label">${canFire ? "Ateş et" : "Kademe 3"}</span><kbd>F</kbd></button></div></div>`,
       (a) => {
         if (a === "pause") this.pauseRun();
         else if (a === "fire") this.fire();

@@ -177,8 +177,7 @@ export class SaveManager {
     }
   }
   public commitRun(s: Readonly<RunSummary>): Reward {
-    if (this.seen.has(s.runId))
-      return { stars: 0, coins: 0, xp: 0, duplicate: true };
+    if (this.seen.has(s.runId)) return { stars: 0, xp: 0, duplicate: true };
     this.refresh();
     const report = applyRun(this.data, s);
     this.seen.add(s.runId);

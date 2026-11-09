@@ -20,3 +20,7 @@ UI/UX Pro Max: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill (MIT). Lo
 Repository arcade-combat and associated game skills applied; documented Phaser 2D adaptation preserved.
 
 Preview only. No production reassignment or main merge.
+
+## Follow-up: remove coins
+Removed pickups, generation, pickup textures, cue recipes/buffers/playback, HUD/menu/wardrobe/result counters, multipliers, magnet powers and coin rewards. Flight/combat powers remain unchanged. Trail selection is free, with obsolete prices zeroed. Schema-v1 wallet values are inert historical data to preserve older records; they are never earned, spent or displayed.
+Adventure stars now mean 1 = complete, 2 = complete without near misses, 3 = all gates centered. Existing best stars/XP/unlocks persist. Added a real-browser regression that loads an older save, verifies no coin texture/audio/objects/UI, completes a run and checks preserved progress/selection/legacy balance.

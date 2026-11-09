@@ -2,7 +2,12 @@ export type RunRequest =
   | { mode: "adventure"; levelId: string; skinId: string }
   | { mode: "endless"; skinId: string };
 export type GamePhase =
-  "ready" | "playing" | "paused" | "won" | "dead" | "results";
+  | "ready"
+  | "playing"
+  | "paused"
+  | "won"
+  | "dead"
+  | "results";
 export type PipeVariant = "static" | "sway" | "pulse";
 export interface RunSummary {
   runId: string;
@@ -12,8 +17,6 @@ export interface RunSummary {
   outcome: "won" | "dead";
   score: number;
   passedGates: number;
-  pickupCoins: number;
-  bonusCoins: number;
   nearMisses: number;
   allPassesCentered: boolean;
   activeDurationMs: number;
@@ -25,7 +28,6 @@ export interface DifficultyState {
   spawnDelay: number;
   swayChance: number;
   pulseChance: number;
-  coinChance: number;
   windChance: number;
 }
 export interface LevelProgress {
@@ -37,6 +39,7 @@ export interface SaveData {
   schemaVersion: 1;
   revision: number;
   updatedAt: string;
+  /** Legacy schema-v1 balance; retained for save compatibility, never earned or spent. */
   wallet: { coins: number };
   xp: number;
   adventure: { levels: Record<string, LevelProgress> };

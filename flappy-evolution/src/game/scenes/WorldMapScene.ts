@@ -65,7 +65,7 @@ export class WorldMapScene extends Phaser.Scene {
             .join("")}</div></article>`,
       ).join(
         "",
-      )}<p class="atlas-end">Her uçuş yeni bir başlangıç.</p></div></div>`,
+      )}<p class="atlas-end">★ Bölümü bitir · ★★ Yakın geçiş yapma · ★★★ Merkezden geç</p></div></div>`,
       (a) => {
         if (a === "menu") {
           this.scene.start("MenuScene");

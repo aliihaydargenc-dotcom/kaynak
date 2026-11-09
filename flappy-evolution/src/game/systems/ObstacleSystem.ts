@@ -17,7 +17,6 @@ export interface PipePair {
   bottom: Phaser.GameObjects.Image;
   topCap: Phaser.GameObjects.Image;
   bottomCap: Phaser.GameObjects.Image;
-  coin?: Phaser.GameObjects.Image;
   wall?: Phaser.GameObjects.Image;
   wallId: string;
 }
@@ -77,7 +76,6 @@ export class ObstacleSystem {
       .setOrigin(0.5, 0)
       .setFlipY(true)
       .setDepth(27);
-    const hasCoin = l ? this.spawned % 2 === 0 : this.random() < d.coinChance;
     const pair: PipePair = {
       x,
       wallId: `wall-${this.spawned}`,
@@ -100,12 +98,6 @@ export class ObstacleSystem {
       bottom,
       topCap,
       bottomCap,
-      coin: hasCoin
-        ? this.scene.add
-            .image(x, this.center, "coin")
-            .setDepth(31)
-            .setScale(0.58)
-        : undefined,
     };
     this.layout(pair, seconds);
     this.pairs.push(pair);
@@ -137,8 +129,6 @@ export class ObstacleSystem {
     p.topCap.setPosition(p.x, p.top.y);
     p.bottomCap.setPosition(p.x, p.bottom.y);
     p.wall?.setPosition(p.x, p.currentCenter + 65);
-    if (p.coin)
-      p.coin.setPosition(p.x, p.currentCenter + (this.level ? 0 : sway * 0.25));
   }
   public collision(birdRect: Phaser.Geom.Rectangle): boolean {
     if (birdRect.bottom >= 742 || birdRect.top <= 4) return true;
@@ -179,7 +169,6 @@ export class ObstacleSystem {
     p.bottom.destroy();
     p.topCap.destroy();
     p.bottomCap.destroy();
-    p.coin?.destroy();
     p.wall?.destroy();
   }
 }
