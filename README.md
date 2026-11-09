@@ -40,6 +40,10 @@ isteklerine 404 dönebilir; bu yanıt tek başına deponun silindiğini kanıtla
 | [research/hotel-pricing.md](research/hotel-pricing.md) | Çok acenteli veri toplama, SerpApi sınırlamaları, fiyat kıyası |
 | [research/workspace-audit.md](research/workspace-audit.md) | EVENTRA, HotelCompare ve rate-collector repo denetimi |
 | [research/implementation-roadmap.md](research/implementation-roadmap.md) | Önceliklendirilmiş geliştirme ve doğrulama adımları |
+| [research/flappy-evolution.md](research/flappy-evolution.md) | Flappy Evolution: Macera/Sonsuz Uçuş, 4 dünya, 20 bölüm, ödül ve gelişim tasarımı |
+| [research/flappy-references.md](research/flappy-references.md) | Flappy/Phaser/mola-app kaynak kodu, sabit sürümler, lisanslar ve uyumluluk değerlendirmesi |
+| [research/flappy-architecture.md](research/flappy-architecture.md) | Phaser 3 + TypeScript + Vite, dikey mobil, yerel kayıt, PWA ve statik Vercel mimarisi |
+| [research/flappy-codex-task.md](research/flappy-codex-task.md) | Bağımsız flappy-evolution reposunda oyun geliştirmek için aşamalı Codex görevi |
 | [design-system/MASTER.md](design-system/MASTER.md) | UI/UX Pro Max ile türetilmiş arayüz kuralları |
 | [data/sources.json](data/sources.json) | Kaynakların doğrulanabilir, makine-okunur kataloğu |
 | [data/rea-evidence.json](data/rea-evidence.json) | REA kayıtlarının kimlik, SHA-256 ve olay sayısı içeren özeti; ham kayıtlar depo dışında |
