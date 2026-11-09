@@ -39,3 +39,6 @@ Human phone playtesting and full 20-level balance remain necessary; automated co
 
 ## Unlimited wallet (user-requested)
 Menu and wardrobe display ∞. Valid trail purchases no longer require or spend coins, including after reload with an existing zero-balance save. Ownership/duplicate checks remain. Historical numeric earnings remain finite and existing saves require no migration; Infinity is never written to JSON. Flight pickups still count for run stats and adventure star targets.
+
+## Character selection fix (user-requested)
+All five characters are now selectable without world completion. Fresh defaults and validation of existing saves grant all known characters; valid selected characters survive reload. Unknown IDs still fall back safely. The home illustration and badge now show the equipped character. Regression covers selecting/reloading all five characters; browser check confirms Nova's appearance and tier-5 powers are equipped in actual play.

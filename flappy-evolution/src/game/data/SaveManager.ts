@@ -16,7 +16,7 @@ export function defaults(): SaveData {
     adventure: { levels: {} },
     endless: { bestScore: 0, topScores: [] },
     inventory: {
-      skins: ["spark"],
+      skins: [...SKINS],
       trails: ["none"],
       selectedSkin: "spark",
       selectedTrail: "none",
@@ -82,12 +82,8 @@ export function validateSave(input: unknown): SaveData {
         .sort((a, b) => b - a)
         .slice(0, 10)
     : [];
-  const unlocked = SKINS.filter(
-    (id, i) => i === 0 || (s.adventure.levels[`${i}-5`]?.bestStars ?? 0) > 0,
-  );
-  s.inventory.skins = [
-    ...new Set(["spark", ...ids(inv.skins, unlocked), ...unlocked]),
-  ];
+  // All characters are available, including when loading older progress saves.
+  s.inventory.skins = [...SKINS];
   s.inventory.trails = [
     ...new Set(["none", ...ids(inv.trails, Object.keys(TRAILS))]),
   ];

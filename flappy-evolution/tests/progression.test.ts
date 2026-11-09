@@ -10,6 +10,7 @@ import {
   starsFor,
   evolution,
 } from "../src/game/data/ProgressionService";
+import { SKINS } from "../src/game/constants";
 import { LEVELS } from "../src/game/data/levels";
 import type { RunSummary } from "../src/game/types";
 const run = (extra: Partial<RunSummary> = {}): RunSummary => ({
@@ -127,7 +128,7 @@ describe("save boundary and transactions", () => {
         b = validateSave(input);
       expect(a.wallet.coins).toBe(0);
       a.inventory.skins.push("bad");
-      expect(b.inventory.skins).toEqual(["spark"]);
+      expect(b.inventory.skins).toEqual([...SKINS]);
     },
   );
   it.each([-1, NaN, Infinity, "12", null, 1.2])(
@@ -159,7 +160,7 @@ describe("save boundary and transactions", () => {
     expect(s.wallet.coins).toBe(2147483647);
     expect(s.adventure.levels.bad).toBeUndefined();
     expect(s.adventure.levels["1-1"].bestStars).toBe(3);
-    expect(s.inventory.selectedSkin).toBe("spark");
+    expect(s.inventory.selectedSkin).toBe("nova");
     expect(s.inventory.selectedTrail).toBe("none");
   });
   it.each(["{", "null", "[]", '{"schemaVersion":1}'])(
@@ -226,4 +227,15 @@ describe("save boundary and transactions", () => {
     expect(s.sessionOnly).toBe(true);
     expect(m.value).toBe('{"schemaVersion":99,"future":"keep"}');
   });
+});
+
+it("all characters can be selected and persist on fresh and old saves", () => {
+  const m = new Memory();
+  m.value = JSON.stringify({...defaults(), inventory: {...defaults().inventory, skins: ['spark']}});
+  for (const id of SKINS) {
+    const s = new SaveManager(m);
+    expect(s.select('skin', id)).toBe(true);
+    expect(new SaveManager(m).data.inventory.selectedSkin).toBe(id);
+  }
+  expect(new SaveManager(m).select('skin', 'unknown')).toBe(false);
 });
