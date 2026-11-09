@@ -23,6 +23,9 @@ export class AssetFactory {
     for (let world = 1; world <= 4; world++) {
       make(`world-${world}`, 480, 854, (c) => this.world(c, world));
       make(`landscape-${world}`, 960, 250, (c) => this.landscape(c, world));
+      make(`clouds-${world}`, 960, 380, (c) => this.clouds(c, world));
+      make(`ridges-${world}`, 960, 420, (c) => this.ridges(c, world));
+      make(`foreground-${world}`, 960, 108, (c) => this.foreground(c, world));
       make(`pipe-body-${world}`, 96, 520, (c) => this.pillar(c, world));
       make(`pipe-cap-${world}`, 108, 24, (c) => {
         const p = WORLD_PALETTES[world - 1];
@@ -47,8 +50,13 @@ export class AssetFactory {
       "crystal",
       "nova",
     ].entries())
-      for (let frame = 0; frame < 3; frame++)
+      for (let frame = 0; frame < 3; frame++) {
         make(`bird-${id}-${frame}`, 72, 64, (c) => this.bird(c, index, frame));
+        make(`portrait-${id}-${frame}`, 288, 256, (c) => {
+          c.scale(4, 4);
+          this.bird(c, index, frame);
+        });
+      }
     make("fireball", 32, 32, (c) => {
       const g = c.createRadialGradient(16, 16, 2, 16, 16, 16);
       g.addColorStop(0, "#ffffff");
@@ -118,106 +126,124 @@ export class AssetFactory {
     skin: number,
     frame: number,
   ): void {
-    const colors = ["#f6c76d", "#a8d785", "#e4af7f", "#afdbef", "#bab0f4"];
-    const y = [38, 31, 22][frame];
-    c.strokeStyle = "#203e43";
-    c.lineWidth = 2.5;
+    const palettes = [
+      ["#ffc75b", "#e67539", "#fff3c9"],
+      ["#9cd768", "#398269", "#eef9c5"],
+      ["#efb37c", "#a85550", "#ffe1a8"],
+      ["#a4e9ff", "#5680be", "#ecffff"],
+      ["#c8acff", "#7256b0", "#fff0ff"],
+    ];
+    const [body, shade, cream] = palettes[skin];
+    c.lineCap = "round";
     c.lineJoin = "round";
-    // Tail fan and rounded body, with distinct silhouettes/details for each character.
-    c.fillStyle = ["#dc7955", "#588b65", "#b56a4f", "#688fcc", "#7f77bc"][skin];
+    c.strokeStyle = "#263d52";
+    c.lineWidth = 2;
+    // Same 72x64 envelope and origin as physics baseline. Art never changes scale.
+    c.fillStyle = shade;
     c.beginPath();
-    c.moveTo(22, 35);
-    c.lineTo(5, 22);
-    c.lineTo(9, 43);
-    c.lineTo(24, 45);
+    c.moveTo(22, 34);
+    c.lineTo(4, 26);
+    c.lineTo(8, 39);
+    c.lineTo(3, 44);
+    c.quadraticCurveTo(15, 50, 27, 43);
     c.fill();
     c.stroke();
-    c.fillStyle = colors[skin];
+    const g = c.createLinearGradient(20, 12, 48, 57);
+    g.addColorStop(0, cream);
+    g.addColorStop(0.3, body);
+    g.addColorStop(1, shade);
+    c.fillStyle = g;
     c.beginPath();
-    c.ellipse(38, 34, 25, 21, 0, 0, 7);
+    c.ellipse(38, 34, 25, 21, -0.1, 0, 7);
     c.fill();
     c.stroke();
-    c.fillStyle = "#fff1cf";
+    c.fillStyle = cream;
     c.beginPath();
-    c.ellipse(45, 40, 15, 12, -0.2, 0, 7);
+    c.ellipse(46, 42, 14, 11, -0.2, 0, 7);
     c.fill();
-    c.fillStyle = ["#e59257", "#55996a", "#b57651", "#739dce", "#8982ce"][skin];
+    c.fillStyle = body;
     c.beginPath();
-    c.moveTo(31, 34);
-    c.quadraticCurveTo(6, y - 17, 17, y);
-    c.quadraticCurveTo(19, y + 14, 37, 41);
-    c.closePath();
+    c.moveTo(28, 16);
+    c.quadraticCurveTo(25, 3, 37, 11);
+    c.quadraticCurveTo(41, 1, 47, 14);
     c.fill();
     c.stroke();
-    if (skin === 0) {
-      c.fillStyle = "#ec895a";
-      c.beginPath();
-      c.moveTo(31, 15);
-      c.quadraticCurveTo(23, 1, 38, 10);
-      c.quadraticCurveTo(41, 0, 46, 15);
-      c.fill();
-    }
     if (skin === 1) {
-      c.fillStyle = "#68a15e";
+      c.fillStyle = "#62b368";
       c.beginPath();
-      c.moveTo(38, 15);
-      c.quadraticCurveTo(24, -1, 48, 7);
-      c.quadraticCurveTo(55, 13, 38, 15);
+      c.moveTo(36, 13);
+      c.quadraticCurveTo(28, -2, 49, 5);
+      c.quadraticCurveTo(51, 13, 36, 13);
       c.fill();
       c.stroke();
     }
     if (skin === 2) {
-      c.fillStyle = "#f9d89b";
-      for (let i = 0; i < 3; i++) {
+      c.fillStyle = "#e86464";
+      c.beginPath();
+      c.moveTo(23, 21);
+      c.quadraticCurveTo(42, 5, 59, 24);
+      c.lineTo(54, 29);
+      c.quadraticCurveTo(40, 15, 25, 28);
+      c.fill();
+    }
+    if (skin >= 3) {
+      c.fillStyle = cream;
+      for (let j = 0; j < 3; j++) {
         c.beginPath();
-        c.moveTo(30 + i * 7, 15);
-        c.lineTo(29 + i * 7, 3 + i * 2);
-        c.lineTo(39 + i * 6, 16);
+        c.moveTo(29 + j * 7, 16);
+        c.lineTo(32 + j * 7, 3 + (j % 2) * 4);
+        c.lineTo(39 + j * 7, 17);
         c.fill();
         c.stroke();
       }
     }
-    if (skin === 3) {
-      c.fillStyle = "#e2faff";
-      c.beginPath();
-      c.moveTo(30, 15);
-      c.lineTo(36, 1);
-      c.lineTo(43, 15);
-      c.lineTo(50, 6);
-      c.lineTo(53, 20);
-      c.closePath();
-      c.fill();
-      c.stroke();
-      c.fillStyle = "#d9f8ff";
-      c.beginPath();
-      c.moveTo(20, 31);
-      c.lineTo(29, 24);
-      c.lineTo(33, 38);
-      c.closePath();
-      c.fill();
-    }
-    if (skin === 4) {
-      c.fillStyle = "#f8e3a2";
-      this.star(c, 38, 12, 11, 5);
-      c.stroke();
-      c.fillStyle = "#fff5dc";
-      this.star(c, 24, 32, 6, 3);
-    }
-    c.fillStyle = "#f9da83";
+    c.fillStyle = shade;
+    const wy = [40, 28, 17][frame];
     c.beginPath();
-    c.moveTo(59, 29);
-    c.lineTo(71, 35);
-    c.lineTo(59, 39);
+    c.moveTo(34, 32);
+    c.bezierCurveTo(11, wy - 14, 7, wy + 2, 17, wy + 10);
+    c.quadraticCurveTo(24, wy + 16, 38, 40);
     c.fill();
     c.stroke();
-    c.fillStyle = "#17333a";
+    c.strokeStyle = body;
+    c.lineWidth = 2;
+    for (let j = 0; j < 3; j++) {
+      c.beginPath();
+      c.moveTo(18 + j * 4, wy + 3);
+      c.lineTo(27 + j * 3, wy + 8);
+      c.stroke();
+    }
+    c.fillStyle = "#fff";
     c.beginPath();
-    c.ellipse(50, 27, 3.8, 5, 0, 0, 7);
+    c.ellipse(50, 27, 8, 10, -0.05, 0, 7);
+    c.fill();
+    c.fillStyle = "#223c51";
+    c.beginPath();
+    c.ellipse(53, 28, 4, 6, 0, 0, 7);
     c.fill();
     c.fillStyle = "#fff";
     c.beginPath();
-    c.arc(51, 25, 1.4, 0, 7);
+    c.arc(54, 25, 1.8, 0, 7);
     c.fill();
+    c.fillStyle = "#f29a5e";
+    c.beginPath();
+    c.ellipse(53, 39, 4, 2, 0, 0, 7);
+    c.fill();
+    c.strokeStyle = "#583c42";
+    c.lineWidth = 1.5;
+    c.fillStyle = "#ffbd5f";
+    c.beginPath();
+    c.moveTo(59, 32);
+    c.quadraticCurveTo(73, 33, 65, 39);
+    c.lineTo(59, 39);
+    c.closePath();
+    c.fill();
+    c.stroke();
+    c.strokeStyle = "#fff6ce";
+    c.lineWidth = 2;
+    c.beginPath();
+    c.arc(38, 30, 19, 3.6, 4.6);
+    c.stroke();
   }
   private static pillar(c: CanvasRenderingContext2D, w: number): void {
     const p = WORLD_PALETTES[w - 1];
@@ -281,106 +307,230 @@ export class AssetFactory {
     }
   }
   private static world(c: CanvasRenderingContext2D, w: number): void {
-    const p = WORLD_PALETTES[w - 1],
-      g = c.createLinearGradient(0, 0, 0, 854);
-    g.addColorStop(0, p[0]);
-    g.addColorStop(1, p[1]);
+    const skies = [
+      ["#367f9c", "#b2d5bc", "#f9e9ac"],
+      ["#846eaa", "#e9ac9c", "#ffe4a7"],
+      ["#3c6694", "#a8d8e6", "#f0f8e8"],
+      ["#151d48", "#514b82", "#bf93b9"],
+    ][w - 1];
+    const g = c.createLinearGradient(0, 0, 0, 854);
+    g.addColorStop(0, skies[0]);
+    g.addColorStop(0.58, skies[1]);
+    g.addColorStop(1, skies[2]);
     c.fillStyle = g;
     c.fillRect(0, 0, 480, 854);
-    c.fillStyle = w === 4 ? "#d1d1f4" : "#fff0bc";
+    const glow = c.createRadialGradient(355, 210, 10, 355, 210, 190);
+    glow.addColorStop(0, "#fff3bcaa");
+    glow.addColorStop(1, "#fff3bc00");
+    c.fillStyle = glow;
+    c.fillRect(0, 0, 480, 600);
+    c.fillStyle = w === 4 ? "#f6dcf5" : "#fff1bc";
     c.beginPath();
-    c.arc(374, 186, w === 4 ? 43 : 65, 0, 7);
+    c.arc(355, 210, w === 4 ? 33 : 48, 0, 7);
     c.fill();
     if (w === 4) {
-      c.strokeStyle = "#7177a3";
-      c.lineWidth = 8;
+      c.fillStyle = "#fff";
+      for (let i = 0; i < 65; i++) {
+        c.globalAlpha = 0.25 + (i % 4) * 0.18;
+        c.beginPath();
+        c.arc(
+          (i * 137) % 480,
+          25 + ((i * 67) % 550),
+          i % 7 === 0 ? 2 : 1,
+          0,
+          7,
+        );
+        c.fill();
+      }
+      c.globalAlpha = 1;
+      c.strokeStyle = "#d1b6df";
+      c.lineWidth = 3;
       c.beginPath();
-      c.ellipse(374, 186, 75, 14, -0.35, 0, 7);
+      c.ellipse(355, 210, 60, 11, -0.4, 0, 7);
       c.stroke();
-      c.fillStyle = "#ded9ff";
-      for (let i = 0; i < 48; i++) {
-        const x = (i * 137 + 23) % 480,
-          y = (i * 73 + 20) % 640;
-        c.beginPath();
-        c.arc(x, y, i % 3 === 0 ? 2 : 1, 0, 7);
-        c.fill();
-      }
-    } else {
-      c.fillStyle = "#ffffff70";
-      for (let i = 0; i < 5; i++) {
-        c.beginPath();
-        c.ellipse(i * 132 - 30, 130 + (i % 2) * 90, 80, 18, 0, 0, 7);
-        c.fill();
-      }
     }
-    c.fillStyle = p[2];
-    c.globalAlpha = 0.25;
-    for (let i = 0; i < 5; i++) {
+    // Sunbeams stay below high-contrast game objects.
+    c.fillStyle = "#fff8d5";
+    c.globalAlpha = 0.06;
+    for (let i = 0; i < 4; i++) {
       c.beginPath();
-      c.moveTo(i * 120 - 60, 750);
-      c.lineTo(i * 120 + 40, 410 + (i % 3) * 50);
-      c.lineTo(i * 120 + 180, 750);
+      c.moveTo(355, 175);
+      c.lineTo(i * 180 - 250, 854);
+      c.lineTo(i * 180 - 140, 854);
       c.fill();
     }
     c.globalAlpha = 1;
-    c.fillStyle = p[3];
-    c.fillRect(0, 750, 480, 104);
-    c.fillStyle = p[2];
-    c.fillRect(0, 750, 480, 8);
-    c.fillStyle = p[1];
-    for (let i = 0; i < 25; i++) {
+  }
+  private static clouds(c: CanvasRenderingContext2D, w: number): void {
+    c.fillStyle = w === 4 ? "#d6bce3" : "#fff7e4";
+    for (let i = 0; i < 8; i++) {
+      const x = i * 135 + 35,
+        y = 75 + (i % 3) * 81;
+      c.globalAlpha = w === 4 ? 0.12 : 0.35;
       c.beginPath();
-      c.ellipse(i * 21, 768 + (i % 3) * 18, 3, 2, 0, 0, 7);
+      c.ellipse(x, y, 68, 12, 0, 0, 7);
+      c.ellipse(x - 20, y - 9, 24, 17, 0, 0, 7);
+      c.ellipse(x + 12, y - 12, 32, 22, 0, 0, 7);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+  }
+  private static ridges(c: CanvasRenderingContext2D, w: number): void {
+    const colors = [
+      ["#8cbda8", "#629c91"],
+      ["#c38c92", "#b07681"],
+      ["#91b6cc", "#7199b8"],
+      ["#817aa6", "#605d8e"],
+    ][w - 1];
+    for (let layer = 0; layer < 2; layer++) {
+      c.fillStyle = colors[layer];
+      c.beginPath();
+      c.moveTo(0, 420);
+      for (let i = -1; i < 10; i++) {
+        const x = i * 130,
+          y = 130 + layer * 95 + (i % 3) * 38;
+        if (w === 3) {
+          c.lineTo(x, y + 95);
+          c.lineTo(x + 65, y);
+          c.lineTo(x + 130, y + 95);
+        } else {
+          c.quadraticCurveTo(x + 55, y - 50, x + 130, y + 60);
+        }
+      }
+      c.lineTo(960, 420);
+      c.fill();
+    }
+    if (w === 3) {
+      c.fillStyle = "#e7f6ef";
+      for (let i = 0; i < 8; i++) {
+        const x = i * 130 + 65,
+          y = 130 + (i % 3) * 38;
+        c.beginPath();
+        c.moveTo(x, y);
+        c.lineTo(x - 26, y + 40);
+        c.lineTo(x - 3, y + 27);
+        c.lineTo(x + 12, y + 38);
+        c.lineTo(x + 28, y + 42);
+        c.fill();
+      }
+    }
+  }
+  private static foreground(c: CanvasRenderingContext2D, w: number): void {
+    const colors = [
+      ["#285b58", "#163f48", "#9ac284"],
+      ["#af7162", "#795261", "#edbd8b"],
+      ["#6b9fbb", "#3c638b", "#c8edec"],
+      ["#57577f", "#343b66", "#d2addb"],
+    ][w - 1];
+    const g = c.createLinearGradient(0, 0, 0, 108);
+    g.addColorStop(0, colors[0]);
+    g.addColorStop(1, colors[1]);
+    c.fillStyle = g;
+    c.beginPath();
+    c.moveTo(0, 25);
+    for (let x = 0; x <= 960; x += 30) c.lineTo(x, 20 + Math.sin(x * 0.03) * 7);
+    c.lineTo(960, 108);
+    c.lineTo(0, 108);
+    c.fill();
+    c.strokeStyle = colors[2];
+    c.lineWidth = 2;
+    c.globalAlpha = 0.35;
+    for (let x = 0; x < 960; x += 25) {
+      c.beginPath();
+      c.moveTo(x, 25);
+      c.quadraticCurveTo(x + 6, 9, x + 12, 12);
+      c.stroke();
+    }
+    c.globalAlpha = 1;
+    c.fillStyle = colors[1];
+    for (let x = 0; x < 960; x += 77) {
+      c.beginPath();
+      c.ellipse(x, 80, 31, 12, -0.4, 0, 7);
       c.fill();
     }
   }
   private static landscape(c: CanvasRenderingContext2D, w: number): void {
-    const p = WORLD_PALETTES[w - 1];
-    c.fillStyle = p[2];
-    c.globalAlpha = 0.5;
-    for (let i = 0; i < 12; i++) {
-      const x = i * 88,
-        y = 50 + (i % 3) * 35;
-      c.beginPath();
-      c.moveTo(x - 60, 250);
-      if (w === 3) {
-        c.lineTo(x + 20, y);
-        c.lineTo(x + 100, 250);
-      } else {
-        c.bezierCurveTo(x - 35, y, x + 45, y, x + 130, 250);
-      }
-      c.fill();
-    }
-    c.globalAlpha = 1;
-    c.fillStyle = p[3];
-    for (let i = 0; i < 11; i++) {
-      const x = i * 100 + 15,
-        y = 110 + (i % 3) * 25;
+    const p = [
+      ["#477f71", "#32645e", "#84b47f"],
+      ["#b88372", "#925f68", "#d9ab84"],
+      ["#6599b6", "#477c9e", "#bbdedc"],
+      ["#6e6592", "#494e79", "#b8a0ce"],
+    ][w - 1];
+    c.fillStyle = p[0];
+    c.beginPath();
+    c.moveTo(0, 250);
+    for (let x = 0; x <= 1000; x += 80)
+      c.quadraticCurveTo(x - 20, 155 + Math.sin(x) * 25, x + 80, 195);
+    c.lineTo(960, 250);
+    c.fill();
+    for (let i = -1; i < 15; i++) {
+      const x = i * 78 + 35,
+        y = 70 + ((i * 37) % 75);
+      c.fillStyle = p[1];
       if (w === 1) {
-        c.fillRect(x, y, 7, 140);
+        c.fillRect(x - 4, y, 8, 160);
+        for (let j = 0; j < 3; j++) {
+          c.fillStyle = j === 0 ? p[0] : p[1];
+          c.beginPath();
+          c.ellipse(
+            x + (j - 1) * 14,
+            y + j * 14,
+            25 - j * 2,
+            40,
+            -0.25 + j * 0.2,
+            0,
+            7,
+          );
+          c.fill();
+        }
+        c.fillStyle = p[2];
+        c.globalAlpha = 0.3;
         c.beginPath();
-        c.ellipse(x + 3, y, 30, 53, -0.2, 0, 7);
+        c.ellipse(x - 10, y - 10, 12, 22, -0.2, 0, 7);
         c.fill();
+        c.globalAlpha = 1;
       } else if (w === 2) {
-        c.fillRect(x, y + 30, 18, 160);
-        c.fillRect(x - 7, y + 20, 32, 12);
+        c.beginPath();
+        c.moveTo(x - 25, 250);
+        c.lineTo(x - 17, y + 20);
+        c.lineTo(x + 12, y);
+        c.lineTo(x + 30, y + 65);
+        c.lineTo(x + 34, 250);
+        c.fill();
+        c.strokeStyle = p[2];
+        c.lineWidth = 3;
+        for (let j = 0; j < 3; j++) {
+          c.beginPath();
+          c.moveTo(x - 15, y + 45 + j * 35);
+          c.lineTo(x + 24, y + 55 + j * 35);
+          c.stroke();
+        }
       } else if (w === 3) {
         c.beginPath();
-        c.moveTo(x, 250);
-        c.lineTo(x - 20, y + 35);
-        c.lineTo(x + 10, y);
-        c.lineTo(x + 35, y + 80);
-        c.lineTo(x + 20, 250);
+        c.moveTo(x - 25, 250);
+        c.lineTo(x - 21, y + 35);
+        c.lineTo(x + 2, y);
+        c.lineTo(x + 25, y + 36);
+        c.lineTo(x + 32, 250);
+        c.fill();
+        c.fillStyle = p[2];
+        c.beginPath();
+        c.moveTo(x + 2, y);
+        c.lineTo(x - 7, 250);
+        c.lineTo(x + 10, 240);
         c.fill();
       } else {
         c.beginPath();
-        c.ellipse(x, y + 90, 45, 12, 0, 0, 7);
+        c.ellipse(x, y + 40, 35, 10, 0, 0, 7);
+        c.moveTo(x - 34, y + 42);
+        c.lineTo(x, y + 100);
+        c.lineTo(x + 34, y + 42);
         c.fill();
+        c.strokeStyle = p[2];
+        c.lineWidth = 2;
         c.beginPath();
-        c.moveTo(x - 36, y + 91);
-        c.lineTo(x, y + 145);
-        c.lineTo(x + 32, y + 91);
-        c.fill();
+        c.ellipse(x, y + 37, 33, 7, 0, 0, 7);
+        c.stroke();
       }
     }
   }

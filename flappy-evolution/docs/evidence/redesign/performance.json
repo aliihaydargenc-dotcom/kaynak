@@ -1,0 +1,18 @@
+{
+  "environment": "Linux Chromium software renderer; not a physical phone benchmark",
+  "metrics": {
+    "renderer": "WebGL",
+    "frames": 137,
+    "medianMs": 66.59999999999854,
+    "p95Ms": 83.40000000000146,
+    "maxSceneObjects": 77,
+    "phase": "results",
+    "score": 0,
+    "viewport": [
+      390,
+      844
+    ],
+    "overflow": false
+  },
+  "errors": []
+}

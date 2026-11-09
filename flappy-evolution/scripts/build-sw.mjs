@@ -9,7 +9,7 @@ const list = async (dir) => {
   }
   return files;
 };
-const files = (await list("dist")).filter((p) => !p.endsWith("/sw.js")).sort();
+const files = (await list("dist")).filter((p) => !p.endsWith("/sw.js") && !p.startsWith("dist/review/")).sort();
 const hash = createHash("sha256");
 for (const p of files) {
   hash.update(p);
@@ -29,7 +29,7 @@ const FILES=${JSON.stringify(urls)};
 self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);try{await cache.addAll(FILES);}catch(error){await caches.delete(CACHE);throw error;}})()));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('flappy-evolution-')&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim();})()));
 self.addEventListener('message',event=>{if(event.data==='ACTIVATE')self.skipWaiting();if(event.data==='STATUS')event.waitUntil((async()=>{const cache=await caches.open(CACHE);const ready=(await cache.keys()).length>=FILES.length;event.ports[0]?.postMessage({ready,build:BUILD});})());});
-self.addEventListener('fetch',event=>{const req=event.request,url=new URL(req.url);if(req.method!=='GET'||url.origin!==self.location.origin||url.pathname.startsWith('/api/')||url.pathname==='/sw.js')return;
+self.addEventListener('fetch',event=>{const req=event.request,url=new URL(req.url);if(req.method!=='GET'||url.origin!==self.location.origin||url.pathname.startsWith('/api/')||url.pathname.startsWith('/review/')||url.pathname==='/sw.js')return;
 if(req.mode==='navigate'){event.respondWith((async()=>{const cache=await caches.open(CACHE);try{const response=await fetch(req);if(response.ok&&(await response.clone().text()).includes('name="flappy-build" content="'+BUILD+'"'))return response;}catch{}return (await cache.match('/index.html'))||Response.error();})());return;}
 if(FILES.includes(url.pathname))event.respondWith(caches.open(CACHE).then(async cache=>(await cache.match(url.pathname))||fetch(req)));
 });

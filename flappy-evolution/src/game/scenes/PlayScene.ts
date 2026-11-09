@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { SceneAtmosphere } from "../systems/SceneAtmosphere";
 import { character, type CharacterPower } from "../data/characters";
 import { CombatModel } from "../systems/CombatModel";
 import { CombatView } from "../systems/CombatView";
@@ -52,7 +53,7 @@ export class PlayScene extends Phaser.Scene {
   private windLabel!: Phaser.GameObjects.Text;
   private debug!: Phaser.GameObjects.Graphics;
   private badge?: Phaser.GameObjects.Arc;
-  private scenery?: Phaser.GameObjects.TileSprite;
+  private atmosphere!: SceneAtmosphere;
   private trailMs = 0;
   private lastHud = "";
   public flapCount = 0;
@@ -122,8 +123,10 @@ export class PlayScene extends Phaser.Scene {
       .text(240, 226, "Dokun ve uç", {
         fontFamily: "system-ui",
         fontSize: "22px",
-        color: "#163c48",
-        backgroundColor: "#f9f4dfe6",
+        color: "#ffffff",
+        stroke: "#23465c",
+        strokeThickness: 5,
+        fontStyle: "bold",
         padding: { x: 16, y: 10 },
         align: "center",
       })
@@ -164,11 +167,7 @@ export class PlayScene extends Phaser.Scene {
     document.querySelector<HTMLElement>("#app")?.focus({ preventScroll: true });
   }
   private createBackground(): void {
-    const world = this.level?.world ?? 1;
-    this.add.image(240, 427, `world-${world}`).setDepth(0);
-    this.scenery = this.add
-      .tileSprite(240, 625, 480, 250, `landscape-${world}`)
-      .setDepth(2);
+    this.atmosphere = new SceneAtmosphere(this, this.level?.world ?? 1);
   }
   private profile(delta: number): DifficultyState {
     return this.level
@@ -262,7 +261,10 @@ export class PlayScene extends Phaser.Scene {
       return;
     }
     if (this.phase !== "playing") {
-      if (this.phase === "ready") this.bird.updateBird(delta);
+      if (this.phase === "ready") {
+        this.bird.updateBird(delta);
+        this.atmosphere.update(delta);
+      }
       return;
     }
     this.activeMs += delta;
@@ -442,7 +444,7 @@ export class PlayScene extends Phaser.Scene {
   }
   private updateDecoration(delta: number): void {
     if (this.reducedMotion()) return;
-    if (this.scenery) this.scenery.tilePositionX += delta * 0.025;
+    this.atmosphere.update(delta);
     this.trailMs -= delta;
     const trail = save.data.inventory.selectedTrail;
     if (trail === "none" || this.trailMs > 0) return;
@@ -546,7 +548,22 @@ export class PlayScene extends Phaser.Scene {
         outcome === "won" ? 0xf4ca75 : 0xf9f4df,
         12,
       );
-      if (outcome === "dead") this.cameras.main.shake(140, 0.004);
+      if (outcome === "dead") {
+        this.cameras.main.shake(180, 0.006);
+        this.cameras.main.flash(160, 255, 227, 192, false);
+        this.bird.setTint(0xffc3a1);
+        const ring = this.add
+          .circle(this.bird.x, this.bird.y, 15)
+          .setStrokeStyle(4, 0xffedca)
+          .setDepth(60);
+        this.tweens.add({
+          targets: ring,
+          scale: 5,
+          alpha: 0,
+          duration: 450,
+          onComplete: () => ring.destroy(),
+        });
+      }
     }
     this.windLabel.setVisible(false);
     this.audioSystem.stop();
@@ -570,7 +587,7 @@ export class PlayScene extends Phaser.Scene {
     this.combatView.render(this.bird.x, this.bird.y, this.reducedMotion());
     this.phase = "results";
     panel(
-      `<p class="eyebrow">${this.level ? `${this.level.id} · ${this.level.name}` : "Sonsuz Uçuş"}</p><h1>${outcome === "won" ? "Bölüm tamamlandı" : "Uçuş bitti"}</h1><div class="stars" aria-label="${reward.stars} yıldız">${"★".repeat(reward.stars)}${"☆".repeat(3 - reward.stars)}</div><div class="result-stats"><strong>${this.score}<small>skor</small></strong><strong>+${reward.coins}<small>jeton</small></strong><strong>+${reward.xp}<small>XP</small></strong></div><p>${this.passedGates} geçiş · ${this.pickupCoins} jeton · ${this.nearMisses} yakın geçiş</p>${this.level ? (outcome === "won" && this.level.id !== "4-5" ? button("next", "Sonraki bölüm", true) : "") : ""}${button("retry", "Tekrar dene", !this.level || outcome === "dead")}${button("menu", "Menüye dön")}<p class="notice">${save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : ""}</p>`,
+      `<div class="result-emblem" aria-hidden="true">${icon(outcome === "won" ? "wing" : "infinity")}</div><p class="eyebrow">${this.level ? `${this.level.id} · ${this.level.name}` : "Sonsuz Uçuş"}</p><h1>${outcome === "won" ? "Bölüm tamamlandı" : "Uçuş bitti"}</h1><div class="stars" aria-label="${reward.stars} yıldız">${"★".repeat(reward.stars)}${"☆".repeat(3 - reward.stars)}</div><div class="result-stats"><strong>${this.score}<small>skor</small></strong><strong>+${reward.coins}<small>jeton</small></strong><strong>+${reward.xp}<small>XP</small></strong></div><p>${this.passedGates} geçiş · ${this.pickupCoins} jeton · ${this.nearMisses} yakın geçiş</p>${this.level ? (outcome === "won" && this.level.id !== "4-5" ? button("next", "Sonraki bölüm", true) : "") : ""}${button("retry", "Tekrar dene", !this.level || outcome === "dead")}${button("menu", "Menüye dön")}<p class="notice">${save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : ""}</p>`,
       (a) => {
         if (a === "retry") void startRun(this, this.request);
         else if (a === "next" && this.level) {
@@ -587,6 +604,7 @@ export class PlayScene extends Phaser.Scene {
       },
       true,
     );
+    document.querySelector("#ui")!.classList.add("result-screen");
   }
   public fire(): void {
     if (this.phase !== "playing") return;
