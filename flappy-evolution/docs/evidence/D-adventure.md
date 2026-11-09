@@ -1,0 +1,3 @@
+# D — adventure catalog
+Exact 20 documented profiles, four worlds, five stages each; predecessor locks enforced both in map and PlayScene. One seeded AdventurePattern drives generation only. Movement phases use activeMs, not scene wall time. Final spawn is capped at gate target. Collision has priority over final pass. Wind: warning at 9s, force from 10s, duration 1.8s, alternating ±120, repeat 12s.
+Catalog tests exercise every gate/movement phase boundary and invalid catalogs. Human completion and balance across all twenty levels remain for real device testing; generated fixtures are not presented as player success.

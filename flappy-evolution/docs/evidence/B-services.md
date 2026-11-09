@@ -1,0 +1,2 @@
+# B — standalone static foundation
+Phaser 3.90.0, TypeScript 5.9.3 and Vite 7.3.1 pinned exactly; Yarn 1.22.22, Node 22.23.4; one yarn.lock. Production build includes typecheck and passes. No score, telemetry, analytics, Redis dependencies, API files, environment credentials or remote fonts were copied. Local record shell replaces upstream username/global scoreboard. Network and offline runtime checks are recorded under H.

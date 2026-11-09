@@ -40,6 +40,7 @@ isteklerine 404 dönebilir; bu yanıt tek başına deponun silindiğini kanıtla
 | [research/hotel-pricing.md](research/hotel-pricing.md) | Çok acenteli veri toplama, SerpApi sınırlamaları, fiyat kıyası |
 | [research/workspace-audit.md](research/workspace-audit.md) | EVENTRA, HotelCompare ve rate-collector repo denetimi |
 | [research/implementation-roadmap.md](research/implementation-roadmap.md) | Önceliklendirilmiş geliştirme ve doğrulama adımları |
+| [flappy-evolution/](flappy-evolution/) | Çalışan Flappy Evolution oyunu: Macera/Sonsuz Uçuş, kaynak kodu, testler ve PWA |
 | [research/flappy-evolution.md](research/flappy-evolution.md) | Flappy Evolution: Macera/Sonsuz Uçuş, 4 dünya, 20 bölüm, ödül ve gelişim tasarımı |
 | [research/flappy-references.md](research/flappy-references.md) | Flappy/Phaser/mola-app kaynak kodu, sabit sürümler, lisanslar ve uyumluluk değerlendirmesi |
 | [research/flappy-architecture.md](research/flappy-architecture.md) | Phaser 3 + TypeScript + Vite, dikey mobil, yerel kayıt, PWA ve statik Vercel mimarisi |

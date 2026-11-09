@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "runId": "01546922-20f7-4d67-a814-b0ff32ab6c6a",
+    "mode": "adventure",
+    "levelId": "1-1",
+    "outcome": "won",
+    "score": 8,
+    "passedGates": 8,
+    "pickupCoins": 4,
+    "bonusCoins": 0,
+    "nearMisses": 0,
+    "allPassesCentered": true,
+    "activeDurationMs": 14366.666666666502
+  },
+  "unlocked": true,
+  "endless": true,
+  "externalRequests": [],
+  "errors": []
+}

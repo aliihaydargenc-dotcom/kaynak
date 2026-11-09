@@ -1,0 +1,48 @@
+{
+  "url": "https://flappy-evolution-theta.vercel.app",
+  "target": "production",
+  "state": "READY",
+  "deploymentId": "dpl_GVu1tWTBz4rRqHZHD7hnyp6p5cx3",
+  "projectId": "prj_ZTo9oXGs3p2vGuIYPksyW2TcvFGb",
+  "team": "aliihaydargenc-dotcoms-projects",
+  "sourceCommit": "d7f358c62083f89bd9ecf704c062a4d24d727723",
+  "buildId": "af64b9d916f2c923",
+  "framework": "vite",
+  "node": "22.x",
+  "yarn": "1.22.22 via Corepack",
+  "httpChecks": [
+    {
+      "path": "/",
+      "status": 200,
+      "cacheControl": "no-cache",
+      "contentType": "text/html; charset=utf-8",
+      "bytes": 952
+    },
+    {
+      "path": "/sw.js",
+      "status": 200,
+      "cacheControl": "no-cache",
+      "contentType": "application/javascript; charset=utf-8",
+      "bytes": 1920
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "status": 200,
+      "cacheControl": "no-cache",
+      "contentType": "application/manifest+json; charset=utf-8",
+      "bytes": 846
+    },
+    {
+      "path": "/assets/index-DbYM6HPZ.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "contentType": "application/javascript; charset=utf-8",
+      "bytes": 42039
+    }
+  ],
+  "notes": [
+    "Source-file deployment; GitHub repository creation/push blocked by available permissions/capabilities.",
+    "Remote interactive browser unavailable due outbound network policy; local Chromium production tests passed.",
+    "Real phone and all-level human balance tests assigned to user."
+  ]
+}

@@ -1,0 +1,3 @@
+# E — progression and persistence
+28 catalog/progression/save tests passed at this stage. Exact star XP differences, 700 total first clears, endless XP cap, loss coins, skin rewards, top-ten ties, repeat purchase/idempotency, unknown JSON and future schema, read/write failures, recovery snapshot, fresh defaults, selection and reload behavior exercised.
+One versioned localStorage envelope. No old Ultra Flappy key reads/writes. Future schemas remain byte-for-byte intact; session-only warning shown. Run/purchase Web Lock on supported browsers; storage change pauses an active flight and asks for reload. This does not claim transactional guarantees in browsers without Web Locks.

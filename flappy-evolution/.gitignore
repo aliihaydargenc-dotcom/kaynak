@@ -1,0 +1,9 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+.env*
+
+# This standalone app ships its own public assets inside the parent repository.
+!public/
+!public/**
