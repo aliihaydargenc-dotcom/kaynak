@@ -49,6 +49,33 @@ export class AssetFactory {
     ].entries())
       for (let frame = 0; frame < 3; frame++)
         make(`bird-${id}-${frame}`, 72, 64, (c) => this.bird(c, index, frame));
+    make("fireball", 32, 32, (c) => {
+      const g = c.createRadialGradient(16, 16, 2, 16, 16, 16);
+      g.addColorStop(0, "#ffffff");
+      g.addColorStop(0.25, "#ffffff");
+      g.addColorStop(0.55, "#ffffffb0");
+      g.addColorStop(1, "#ffffff00");
+      c.fillStyle = g;
+      c.fillRect(0, 0, 32, 32);
+    });
+    make("cracked-wall", 42, 76, (c) => {
+      c.fillStyle = "#714c59";
+      c.strokeStyle = "#ffca89";
+      c.lineWidth = 3;
+      c.beginPath();
+      c.roundRect(2, 2, 38, 72, 7);
+      c.fill();
+      c.stroke();
+      c.beginPath();
+      c.moveTo(25, 2);
+      c.lineTo(16, 26);
+      c.lineTo(30, 36);
+      c.lineTo(12, 52);
+      c.lineTo(20, 74);
+      c.stroke();
+      c.fillStyle = "#ffd9a0";
+      this.star(c, 21, 38, 8, 4);
+    });
     make("coin", 64, 64, (c) => {
       c.fillStyle = "#8a522e";
       c.beginPath();

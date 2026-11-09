@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { character } from "../data/characters";
 import { button, panel } from "../../ui/UiBridge";
 import { icon } from "../../ui/icons";
 import { startRun } from "../../ui/startRun";
@@ -47,7 +48,7 @@ export class MenuScene extends Phaser.Scene {
         (id, i) => {
           const owned = inv.skins.includes(id),
             selected = inv.selectedSkin === id;
-          return `<button data-action="skin:${id}" aria-pressed="${selected}" ${owned ? "" : "disabled"}><span class="skin-preview skin-${id}"><img src="/icons/skin-${id}.svg" alt="" width="72" height="64"></span><strong>${SKIN_NAMES[i]}</strong><small>${selected ? "Seçili" : owned ? "Seç" : `Kilitli · Dünya ${i} tamamla`}</small></button>`;
+          return `<button data-action="skin:${id}" aria-pressed="${selected}" ${owned ? "" : "disabled"}><span class="skin-preview skin-${id}"><img src="/icons/skin-${id}.svg" alt="" width="72" height="64"></span><strong>${SKIN_NAMES[i]} · K${i + 1}</strong><p class="power-description">${character(id).description}</p><small>${selected ? "Seçili" : owned ? "Seç" : `Kilitli · Dünya ${i} tamamla`}</small></button>`;
         },
       ).join("")}</div><h2>Uçuş izleri</h2><div class="grid">${Object.entries(
         TRAILS,
@@ -95,7 +96,7 @@ export class MenuScene extends Phaser.Scene {
   }
   private settings(): void {
     panel(
-      `<h1>Ayarlar</h1><div class="settings-list">${button("sound", save.data.settings.sound ? "Ses: Açık" : "Ses: Kapalı")}<label for="motion">Dekoratif hareket</label><select id="motion"><option value="system" ${save.data.settings.reducedMotion === "system" ? "selected" : ""}>Sistem tercihi</option><option value="on" ${save.data.settings.reducedMotion === "on" ? "selected" : ""}>Azaltılmış</option><option value="off" ${save.data.settings.reducedMotion === "off" ? "selected" : ""}>Tam hareket</option></select>${button("fullscreen", "Tam ekranı dene")}<p>Dokun / Space / ↑: yüksel · Esc: duraklat</p><h2>Yerel rekorlar</h2><p>${save.data.endless.topScores.length ? save.data.endless.topScores.join(" · ") : "İlk rekorunu yazmak için Sonsuz Uçuş’a başla."}</p></div>${button("back", "Menüye dön", true)}${this.notice()}`,
+      `<h1>Ayarlar</h1><div class="settings-list">${button("sound", save.data.settings.sound ? "Ses: Açık" : "Ses: Kapalı")}<label for="motion">Dekoratif hareket</label><select id="motion"><option value="system" ${save.data.settings.reducedMotion === "system" ? "selected" : ""}>Sistem tercihi</option><option value="on" ${save.data.settings.reducedMotion === "on" ? "selected" : ""}>Azaltılmış</option><option value="off" ${save.data.settings.reducedMotion === "off" ? "selected" : ""}>Tam hareket</option></select>${button("fullscreen", "Tam ekranı dene")}<p>Dokun / Space / ↑: yüksel · F: ateş · Esc: duraklat</p><h2>Yerel rekorlar</h2><p>${save.data.endless.topScores.length ? save.data.endless.topScores.join(" · ") : "İlk rekorunu yazmak için Sonsuz Uçuş’a başla."}</p></div>${button("back", "Menüye dön", true)}${this.notice()}`,
       (a) => {
         if (a === "back") this.home();
         else if (a === "sound") {

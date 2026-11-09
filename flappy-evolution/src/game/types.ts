@@ -2,15 +2,11 @@ export type RunRequest =
   | { mode: "adventure"; levelId: string; skinId: string }
   | { mode: "endless"; skinId: string };
 export type GamePhase =
-  | "ready"
-  | "playing"
-  | "paused"
-  | "won"
-  | "dead"
-  | "results";
+  "ready" | "playing" | "paused" | "won" | "dead" | "results";
 export type PipeVariant = "static" | "sway" | "pulse";
 export interface RunSummary {
   runId: string;
+  characterId?: string;
   mode: "adventure" | "endless";
   levelId?: string;
   outcome: "won" | "dead";

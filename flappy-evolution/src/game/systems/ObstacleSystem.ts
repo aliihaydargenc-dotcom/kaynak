@@ -18,6 +18,8 @@ export interface PipePair {
   topCap: Phaser.GameObjects.Image;
   bottomCap: Phaser.GameObjects.Image;
   coin?: Phaser.GameObjects.Image;
+  wall?: Phaser.GameObjects.Image;
+  wallId: string;
 }
 // Adapted from upstream PlayScene spawnPipePair/applyPairLayout/destroyPair/checkCollisions.
 export class ObstacleSystem {
@@ -78,6 +80,13 @@ export class ObstacleSystem {
     const hasCoin = l ? this.spawned % 2 === 0 : this.random() < d.coinChance;
     const pair: PipePair = {
       x,
+      wallId: `wall-${this.spawned}`,
+      wall:
+        l && l.world >= 2 && this.spawned % 4 === 0
+          ? this.scene.add
+              .image(x, this.center + 65, "cracked-wall")
+              .setDepth(29)
+          : undefined,
       gapCenter: this.center,
       gapSize: gap,
       currentCenter: this.center,
@@ -127,15 +136,22 @@ export class ObstacleSystem {
     p.bottom.setPosition(p.x, p.currentCenter + p.currentGap * 0.5);
     p.topCap.setPosition(p.x, p.top.y);
     p.bottomCap.setPosition(p.x, p.bottom.y);
+    p.wall?.setPosition(p.x, p.currentCenter + 65);
     if (p.coin)
       p.coin.setPosition(p.x, p.currentCenter + (this.level ? 0 : sway * 0.25));
   }
   public collision(birdRect: Phaser.Geom.Rectangle): boolean {
     if (birdRect.bottom >= 742 || birdRect.top <= 4) return true;
-    return this.pairs.some((p) =>
-      this.rects(p).some((r) =>
-        Phaser.Geom.Intersects.RectangleToRectangle(birdRect, r),
-      ),
+    return this.pairs.some(
+      (p) =>
+        (p.wall &&
+          Phaser.Geom.Intersects.RectangleToRectangle(
+            birdRect,
+            p.wall.getBounds(),
+          )) ||
+        this.rects(p).some((r) =>
+          Phaser.Geom.Intersects.RectangleToRectangle(birdRect, r),
+        ),
     );
   }
   public rects(p: PipePair): Phaser.Geom.Rectangle[] {
@@ -164,5 +180,6 @@ export class ObstacleSystem {
     p.topCap.destroy();
     p.bottomCap.destroy();
     p.coin?.destroy();
+    p.wall?.destroy();
   }
 }

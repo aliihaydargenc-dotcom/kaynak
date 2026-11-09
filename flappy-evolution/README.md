@@ -50,3 +50,6 @@ Kayıt yalnız aynı origin/tarayıcı profiline aittir; bulut eşitlemesi yoktu
 [Test raporu](docs/evidence/H-report.md), [grafik/ses kökeni](docs/ASSET_PROVENANCE.md), [tasarım sistemi](design-system/MASTER.md), [üçüncü taraf bildirimleri](THIRD_PARTY_NOTICES.md). Tam kaynak gereksinimleri `docs/flappy-*.md` altında saklıdır.
 
 İlk talepte yayın kapsam dışıydı; kullanıcı daha sonra açıkça Vercel yayını istedi. Güncel yayın/commit bilgisi test raporunda tutulur. Telefon/Android/iOS kurulum ve 20 bölüm insan/dengelenme testini kullanıcı yapacak.
+
+## Combat / character upgrade
+See [combat design and installed skill references](docs/combat-upgrade.md). Flight HUD redesigned; five increasing character tiers, ZzFX sound synthesis, pooled fireballs, optional cracked walls and two-phase adventure bosses. Tap sky/Space to flap, tap fire or F to shoot. First two characters receive basic fire only during a boss. Existing saves are retained.

@@ -1,3 +1,4 @@
+import { character } from "./characters";
 import { SKINS, TRAILS } from "../constants";
 import { getLevel } from "./levels";
 import type { RunSummary, SaveData } from "../types";
@@ -30,7 +31,10 @@ export function applyRun(data: SaveData, s: Readonly<RunSummary>): Reward {
   if (data.processedRunIds.includes(s.runId))
     return { stars: 0, coins: 0, xp: 0, duplicate: true };
   const stars = starsFor(s);
-  let coins = bounded(s.pickupCoins + s.bonusCoins),
+  let coins = bounded(
+      (s.pickupCoins + s.bonusCoins) *
+        character(s.characterId ?? "spark").multiplier,
+    ),
     xp = 0,
     skin: string | undefined;
   if (s.mode === "adventure" && s.levelId) {

@@ -32,6 +32,9 @@ for (const [width, height] of [
         (window as any).flappyGame.scene.isActive("PlayScene"),
     );
     expect(await measure()).toEqual({ overflow: false, small: [] });
+    const top = await page.locator('.flight-top').boundingBox();
+    expect(top!.y).toBeGreaterThanOrEqual(0);
+    expect(top!.x + top!.width).toBeLessThanOrEqual(width);
     if (width === 390) {
       await page.evaluate(() => {
         const g = (window as any).flappyGame;

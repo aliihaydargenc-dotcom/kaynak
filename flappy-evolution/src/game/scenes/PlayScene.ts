@@ -1,4 +1,8 @@
 import Phaser from "phaser";
+import { character, type CharacterPower } from "../data/characters";
+import { CombatModel } from "../systems/CombatModel";
+import { CombatView } from "../systems/CombatView";
+import { icon } from "../../ui/icons";
 import { GAME_HEIGHT, GAME_WIDTH } from "../constants";
 import { startRun } from "../../ui/startRun";
 import { currentRunLock, releaseRunLock } from "../data/RunLock";
@@ -17,6 +21,10 @@ import type {
 } from "../types";
 export class PlayScene extends Phaser.Scene {
   public bird!: Bird;
+  public combat!: CombatModel;
+  public power!: CharacterPower;
+  private combatView!: CombatView;
+  private bossStarted = false;
   public obstacles!: ObstacleSystem;
   public phase: GamePhase = "ready";
   public activeMs = 0;
@@ -67,6 +75,10 @@ export class PlayScene extends Phaser.Scene {
       this.scene.start("MenuScene");
       return;
     }
+    this.power = character(this.request.skinId);
+    this.combat = new CombatModel(this.power);
+    this.combatView = new CombatView(this, this.combat);
+    this.bossStarted = false;
     this.lockToken = currentRunLock();
     this.physics.world.resume();
     this.runId = crypto.randomUUID();
@@ -107,11 +119,11 @@ export class PlayScene extends Phaser.Scene {
         .setDepth(24);
     }
     this.status = this.add
-      .text(240, 172, "Dokun ve uç", {
+      .text(240, 226, "Dokun ve uç", {
         fontFamily: "system-ui",
-        fontSize: "25px",
-        color: "#ffffff",
-        backgroundColor: "#102e32",
+        fontSize: "22px",
+        color: "#163c48",
+        backgroundColor: "#f9f4dfe6",
         padding: { x: 16, y: 10 },
         align: "center",
       })
@@ -145,6 +157,7 @@ export class PlayScene extends Phaser.Scene {
       this.time.removeAllEvents();
       this.tweens.killAll();
       this.obstacles.clear();
+      this.combatView.dispose();
       clearPanel();
     });
     this.refreshHud();
@@ -176,6 +189,11 @@ export class PlayScene extends Phaser.Scene {
   }
   private key = (e: KeyboardEvent): void => {
     if (e.repeat) return;
+    if (e.code === "KeyF" && this.phase === "playing") {
+      e.preventDefault();
+      this.fire();
+      return;
+    }
     if (
       e.code === "Escape" &&
       (this.phase === "ready" || this.phase === "playing")
@@ -215,7 +233,7 @@ export class PlayScene extends Phaser.Scene {
       this.status.setVisible(false);
       this.bird.setGameplayGravity(true);
     } else if (this.phase !== "playing") return;
-    this.bird.flap();
+    this.bird.flap(this.power.flap);
     this.flapRipple();
     this.flapCount++;
     this.audioSystem.resume();
@@ -236,8 +254,7 @@ export class PlayScene extends Phaser.Scene {
           this.tweens.resumeAll();
           this.bird.anims.resume();
           this.status.setVisible(this.phase === "ready");
-          if (this.phase === "ready")
-            this.status.setText("Dokun ve uç");
+          if (this.phase === "ready") this.status.setText("Dokun ve uç");
           this.lastHud = "";
           this.refreshHud();
         }
@@ -253,19 +270,76 @@ export class PlayScene extends Phaser.Scene {
     this.bird.updateBird(delta);
     this.badge?.setPosition(this.bird.x, this.bird.y);
     this.spawnCooldown -= delta;
-    if (this.spawnCooldown <= 0) {
+    if (!this.bossStarted && this.spawnCooldown <= 0) {
       this.obstacles.spawn(this.difficulty, this.activeMs / 1000);
       this.spawnCooldown += this.difficulty.spawnDelay;
     }
     this.updateWind(delta);
+    if (this.combat.update(delta, this.bird.y)) this.audioSystem.warning();
+    // Resolve hostile contacts first, so a simultaneous boss kill cannot erase a player hit.
+    for (const shot of this.combat.shots) {
+      if (
+        shot.active &&
+        shot.enemy &&
+        this.combat.contact(shot, "player", this.bird.getHitbox())
+      ) {
+        if (!this.combat.absorb()) {
+          this.finishRun("dead");
+          return;
+        }
+        this.audioSystem.hit();
+        this.burst(this.bird.x, this.bird.y, 0x8eeeff, 8);
+      }
+    }
+    for (const shot of this.combat.shots) {
+      if (!shot.active || shot.enemy) continue;
+      for (const pair of this.obstacles.pairs)
+        if (
+          pair.wall &&
+          this.combat.contact(shot, pair.wallId, pair.wall.getBounds())
+        ) {
+          this.burst(pair.wall.x, pair.wall.y, 0xffcc8a, 10);
+          this.audioSystem.break();
+          pair.wall.destroy();
+          pair.wall = undefined;
+        }
+      if (this.combat.hitBoss(shot)) {
+        this.audioSystem.boss();
+        this.burst(this.combat.boss!.x, this.combat.boss!.y, 0xffd18e, 6);
+      }
+    }
+    this.combatView.render(this.bird.x, this.bird.y, this.reducedMotion());
     this.obstacles.move(this.activeMs / 1000, delta, this.difficulty.speed);
     // Collision precedes every reward, including the final adventure gate.
     if (this.obstacles.collision(this.bird.getHitbox())) {
-      this.finishRun("dead");
-      return;
+      if (!this.combat.absorb()) {
+        this.finishRun("dead");
+        return;
+      }
+      if (this.bird.y < 80 || this.bird.y > 680) {
+        this.bird.setPosition(
+          this.bird.x,
+          Phaser.Math.Clamp(this.bird.y, 85, 670),
+        );
+        (this.bird.body as Phaser.Physics.Arcade.Body).reset(
+          this.bird.x,
+          this.bird.y,
+        );
+      }
     }
     this.collectRewards();
-    if (this.level && this.passedGates >= this.level.gates) {
+    if (
+      this.level &&
+      this.passedGates >= this.level.gates &&
+      !this.bossStarted
+    ) {
+      this.bossStarted = true;
+      this.obstacles.clear();
+      this.combat.startBoss(this.level.world, this.level.order);
+      this.combat.boss!.aimY = this.bird.y;
+      this.audioSystem.warning();
+    }
+    if (this.combat.boss?.state === "defeated") {
       this.finishRun("won");
       return;
     }
@@ -275,6 +349,23 @@ export class PlayScene extends Phaser.Scene {
   }
   private collectRewards(): void {
     for (const p of this.obstacles.pairs) {
+      if (p.coin) {
+        if (
+          this.power.magnet &&
+          Phaser.Math.Distance.Between(
+            this.bird.x,
+            this.bird.y,
+            p.coin.x,
+            p.coin.y,
+          ) <= this.power.magnet
+        ) {
+          this.pickupCoins++;
+          this.audioSystem.coin();
+          this.burst(p.coin.x, p.coin.y, 0xf4ca75, 8);
+          p.coin.destroy();
+          p.coin = undefined;
+        }
+      }
       if (p.coin) {
         const b = p.coin.getBounds();
         const r = new Phaser.Geom.Rectangle(
@@ -373,11 +464,18 @@ export class PlayScene extends Phaser.Scene {
   // Effects use separate objects: Bird scale, origin and hitbox stay unchanged.
   private flapRipple(): void {
     if (this.reducedMotion()) return;
-    const ring = this.add.circle(this.bird.x - 12, this.bird.y + 10, 9)
-      .setStrokeStyle(2, 0xf9f4df, 0.65).setDepth(19);
+    const ring = this.add
+      .circle(this.bird.x - 12, this.bird.y + 10, 9)
+      .setStrokeStyle(2, 0xf9f4df, 0.65)
+      .setDepth(19);
     this.tweens.add({
-      targets: ring, x: ring.x - 22, scale: 2.8, alpha: 0,
-      duration: 240, ease: "Sine.Out", onComplete: () => ring.destroy(),
+      targets: ring,
+      x: ring.x - 22,
+      scale: 2.8,
+      alpha: 0,
+      duration: 240,
+      ease: "Sine.Out",
+      onComplete: () => ring.destroy(),
     });
   }
   private burst(x: number, y: number, color: number, count: number): void {
@@ -390,7 +488,10 @@ export class PlayScene extends Phaser.Scene {
         targets: mote,
         x: x + Math.cos(angle) * radius,
         y: y + Math.sin(angle) * radius,
-        alpha: 0, scale: 0.25, duration: 380, ease: "Cubic.Out",
+        alpha: 0,
+        scale: 0.25,
+        duration: 380,
+        ease: "Cubic.Out",
         onComplete: () => mote.destroy(),
       });
     }
@@ -439,7 +540,12 @@ export class PlayScene extends Phaser.Scene {
     this.physics.world.pause();
     this.bird.kill();
     if (!this.reducedMotion()) {
-      this.burst(this.bird.x, this.bird.y, outcome === "won" ? 0xf4ca75 : 0xf9f4df, 12);
+      this.burst(
+        this.bird.x,
+        this.bird.y,
+        outcome === "won" ? 0xf4ca75 : 0xf9f4df,
+        12,
+      );
       if (outcome === "dead") this.cameras.main.shake(140, 0.004);
     }
     this.windLabel.setVisible(false);
@@ -455,11 +561,13 @@ export class PlayScene extends Phaser.Scene {
       pickupCoins: this.pickupCoins,
       bonusCoins: this.bonusCoins,
       nearMisses: this.nearMisses,
+      characterId: this.power.id,
       allPassesCentered: this.allPassesCentered,
       activeDurationMs: this.activeMs,
     });
     const reward = save.commitRun(this.summary);
     releaseRunLock(this.lockToken);
+    this.combatView.render(this.bird.x, this.bird.y, this.reducedMotion());
     this.phase = "results";
     panel(
       `<p class="eyebrow">${this.level ? `${this.level.id} · ${this.level.name}` : "Sonsuz Uçuş"}</p><h1>${outcome === "won" ? "Bölüm tamamlandı" : "Uçuş bitti"}</h1><div class="stars" aria-label="${reward.stars} yıldız">${"★".repeat(reward.stars)}${"☆".repeat(3 - reward.stars)}</div><div class="result-stats"><strong>${this.score}<small>skor</small></strong><strong>+${reward.coins}<small>jeton</small></strong><strong>+${reward.xp}<small>XP</small></strong></div><p>${this.passedGates} geçiş · ${this.pickupCoins} jeton · ${this.nearMisses} yakın geçiş</p>${this.level ? (outcome === "won" && this.level.id !== "4-5" ? button("next", "Sonraki bölüm", true) : "") : ""}${button("retry", "Tekrar dene", !this.level || outcome === "dead")}${button("menu", "Menüye dön")}<p class="notice">${save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : ""}</p>`,
@@ -480,20 +588,108 @@ export class PlayScene extends Phaser.Scene {
       true,
     );
   }
+  public fire(): void {
+    if (this.phase !== "playing") return;
+    this.audioSystem.resume();
+    if (this.combat.fire(this.bird.x, this.bird.y)) this.audioSystem.fire();
+    this.refreshHud();
+  }
   private refreshHud(): void {
-    const text = `${this.score}:${this.pickupCoins}:${this.bonusCoins}:${this.allPassesCentered}:${save.data.settings.sound}`;
+    const boss = this.combat.boss;
+    const canFire = this.power.damage > 0 || !!boss;
+    const ready = this.combat.cooldown <= 0;
+    const cooldown = Math.round(
+      100 * (1 - this.combat.cooldown / this.power.cooldown),
+    );
+    const coins = (this.pickupCoins + this.bonusCoins) * this.power.multiplier;
+    const text = `${this.score}:${coins}:${boss?.hp}:${boss?.phase}:${boss?.state}:${this.combat.shields}:${cooldown}:${save.data.settings.sound}`;
     if (text === this.lastHud) return;
+    if (text === this.lastHud) return;
+    // Preserve DOM nodes while the counter and cooldown change: keyboard focus and pointer targets stay stable.
+    if (document.querySelector("#flight-hud")) {
+      const set = (id: string, value: string) => {
+        const el = document.getElementById(id);
+        if (el && el.textContent !== value) el.textContent = value;
+      };
+      set(
+        "run-score",
+        String(
+          this.level ? `${this.passedGates}/${this.level.gates}` : this.score,
+        ),
+      );
+      set("run-coins", String(coins));
+      set("shield-count", String(this.combat.shields));
+      set(
+        "boss-name",
+        boss ? `${boss.definition.name} · Faz ${boss.phase}` : "",
+      );
+      const bossPanel = document.getElementById("boss-panel")!;
+      bossPanel.hidden = !boss;
+      const hp = document.querySelector<HTMLProgressElement>("#boss-hp")!;
+      hp.max = boss?.maxHealth ?? 1;
+      hp.value = boss?.hp ?? 0;
+      set(
+        "boss-warning",
+        boss?.state === "windup"
+          ? "Saldırı hazırlanıyor"
+          : boss?.state === "attack"
+            ? "Kaçın!"
+            : "Ateş et",
+      );
+      const fire = document.querySelector<HTMLButtonElement>(
+        '[data-action="fire"]',
+      )!;
+      fire.disabled = !canFire || !ready;
+      fire.style.setProperty("--charge", `${cooldown}%`);
+      fire.setAttribute(
+        "aria-label",
+        !canFire
+          ? "Ateş topu: Kademe 3 ile açılır"
+          : ready
+            ? "Ateş et"
+            : `Doluyor: ${(this.combat.cooldown / 1000).toFixed(1)} saniye`,
+      );
+      set(
+        "fire-label",
+        !canFire
+          ? "Kademe 3"
+          : ready
+            ? "Ateş et"
+            : `${(this.combat.cooldown / 1000).toFixed(1)}s`,
+      );
+      if (coins !== Number(this.lastHud.split(":")[1]) && !this.reducedMotion())
+        document
+          .getElementById("run-coins")
+          ?.animate([{ transform: "scale(1.3)" }, { transform: "scale(1)" }], {
+            duration: 200,
+          });
+      this.lastHud = text;
+      return;
+    }
     this.lastHud = text;
     hud(
-      `<div class="hud-top"><div class="hud-score"><strong>${this.level ? `${this.passedGates}/${this.level.gates}` : this.score}</strong><span>${this.level ? this.level.id + " · " + this.level.name : "Sonsuz Uçuş"}</span></div>${button("sound", save.data.settings.sound ? "Ses açık" : "Ses kapalı")}${button("pause", "Duraklat")}</div><div class="hud-bottom"><span>Jeton ${this.pickupCoins + this.bonusCoins}</span><span>${this.level ? (this.allPassesCentered ? "Kusursuz rota" : "Serbest rota") : "Rekor " + save.data.endless.bestScore}</span></div>`,
+      `<div id="flight-hud"><div class="flight-top glass"><div class="flight-score"><small>${this.level ? this.level.id + " · " + this.level.name : "SONSUZ UÇUŞ"}</small><strong id="run-score">${this.level ? `${this.passedGates}/${this.level.gates}` : this.score}</strong></div><div class="coin-pill">${icon("coin")}<b id="run-coins">${coins}</b></div><button data-action="sound" class="hud-icon" aria-label="${save.data.settings.sound ? "Ses açık" : "Ses kapalı"}">${icon(save.data.settings.sound ? "sound" : "muted")}</button><button data-action="pause" class="hud-icon" aria-label="Duraklat">${icon("pause")}</button></div><div id="boss-panel" class="boss-panel glass" ${boss ? "" : "hidden"}><div><strong id="boss-name">${boss?.definition.name ?? ""}</strong><span id="boss-warning"></span></div><progress id="boss-hp" aria-label="Boss canı" max="${boss?.maxHealth ?? 1}" value="${boss?.hp ?? 0}"></progress></div><div class="flight-bottom"><div class="power-chip glass">${icon("shield")}<span><b>${this.power.label} · K${this.power.tier}</b><small>Kalkan <span id="shield-count">${this.combat.shields}</span> · ${this.power.multiplier}× jeton</small></span></div><button data-action="fire" class="fire-control" style="--charge:${cooldown}%" aria-label="Ateş et" ${!canFire || !ready ? "disabled" : ""}>${icon("fire")}<span id="fire-label">${canFire ? "Ateş et" : "Kademe 3"}</span><kbd>F</kbd></button></div></div>`,
       (a) => {
         if (a === "pause") this.pauseRun();
+        else if (a === "fire") this.fire();
         else {
           save.setSettings(
             !save.data.settings.sound,
             save.data.settings.reducedMotion,
           );
           this.audioSystem.enabled = save.data.settings.sound;
+          const sound = document.querySelector<HTMLButtonElement>(
+            '[data-action="sound"]',
+          );
+          if (sound) {
+            sound.setAttribute(
+              "aria-label",
+              save.data.settings.sound ? "Ses açık" : "Ses kapalı",
+            );
+            sound.innerHTML = icon(
+              save.data.settings.sound ? "sound" : "muted",
+            );
+          }
           this.refreshHud();
         }
       },

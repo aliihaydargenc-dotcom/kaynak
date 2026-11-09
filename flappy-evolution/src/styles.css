@@ -28,7 +28,7 @@ body {
   height: 100dvh;
   padding: env(safe-area-inset-top) env(safe-area-inset-right)
     env(safe-area-inset-bottom) env(safe-area-inset-left);
-  overflow: hidden;
+  overflow: clip;
 }
 #app {
   width: 100%;
@@ -452,14 +452,209 @@ section > h1 {
   display: none;
 }
 @keyframes panel-in {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes hero-float {
-  0%, 100% { transform: translateY(3px) rotate(-2deg); }
-  50% { transform: translateY(-7px) rotate(2deg); }
+  0%,
+  100% {
+    transform: translateY(3px) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
 }
 @keyframes orbit-breathe {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Flight HUD: a small floating instrument cluster, with clear sky around it. */
+.glass {
+  background: linear-gradient(135deg, #10283bea, #143b45d9);
+  border: 1px solid #c4f5ff38;
+  box-shadow:
+    0 8px 24px #06131c28,
+    inset 0 1px #ffffff12;
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+.flight-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px;
+  padding: 10px;
+  border-radius: 22px;
+}
+.flight-score {
+  flex: 1;
+  min-width: 0;
+  padding-left: 4px;
+}
+.flight-score small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #bcdadf;
+}
+.flight-score strong {
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.coin-pill {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: #ffdb8d;
+  padding: 8px;
+  background: #ffcf7810;
+  border-radius: 14px;
+}
+#run-coins {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+.hud button {
+  pointer-events: auto;
+}
+.hud-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid #ffffff20;
+  border-radius: 15px;
+  background: #ffffff09;
+}
+.boss-panel {
+  margin: 0 20px;
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+.boss-panel[hidden] {
+  display: none;
+}
+.boss-panel > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.boss-panel strong {
+  font-size: 12px;
+}
+.boss-panel span {
+  color: #ffd49a;
+  font-size: 10px;
+}
+.boss-panel progress {
+  width: 100%;
+  height: 8px;
+  display: block;
+  border: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #061c2c;
+  accent-color: #ff7b93;
+}
+.boss-panel progress::-webkit-progress-bar {
+  background: #061c2c;
+}
+.boss-panel progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #ff567e, #ffb78f);
+  transition: width 140ms;
+}
+.boss-panel progress::-moz-progress-bar {
+  background: #ff7b93;
+}
+.flight-bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+.power-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 18px;
+}
+.power-chip > .icon {
+  color: #a7e5e6;
+  width: 20px;
+}
+.power-chip b {
+  display: block;
+  font-size: 12px;
+}
+.power-chip small {
+  display: block;
+  margin-top: 4px;
+  color: #b8d3d8;
+  font-size: 10px;
+}
+.fire-control {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 4px 8px;
+  align-items: center;
+  min-width: 118px;
+  min-height: 68px;
+  border-radius: 20px;
+  border: 1px solid #ffd99080;
+  color: #ffe9ba;
+  background: linear-gradient(
+    0deg,
+    #e8ac5140 var(--charge),
+    #122b3bf2 var(--charge)
+  );
+  box-shadow: 0 6px 24px #04182344;
+  font-size: 13px;
+  font-weight: 700;
+}
+.fire-control kbd {
+  grid-column: 2;
+  color: #b0cbd3;
+  font: 10px system-ui;
+}
+.fire-control:disabled {
+  opacity: 0.7;
+}
+.power-description {
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 6px 0;
+}
+@media (max-height: 450px) {
+  .flight-top {
+    margin: 6px 12px;
+    padding: 6px;
+  }
+  .flight-bottom {
+    bottom: 6px;
+  }
+  .boss-panel {
+    padding: 6px 12px;
+  }
 }

@@ -14,3 +14,6 @@ Shell respects safe-area and 100dvh, 480×854 FIT game space. Landscape letterbo
 ## Motion/audio
 Phaser AnimationManager plays the original three textures in a four-step 2→1→0→1 wing cycle at 85ms per frame; each flap restarts at the raised wing. Pause freezes the animation and collision stops it. Separate short-lived tween objects provide flap rings and reward bursts without scaling or moving the Bird. Cosmetic XP ring and trails never alter Bird bounds. Reduced motion uses stored system/on/off setting and disables decorative parallax/trails/rings/bursts/camera shake and CSS transitions; gameplay obstacle motion remains. Mute persists, gains disconnected on scene shutdown, oscillators stopped on pause and finish.
 Real-time gameplay screen-reader equivalence is not claimed. Menus, instructions, results and control names are semantic HTML.
+
+## Combat update (user-requested)
+The previous cosmetic-only progression is superseded by docs/combat-upgrade.md and data/characters.ts. Glass flight HUD uses stable DOM counters, labeled SVG sound/pause buttons, boss health progress and a 48px+ fire action with cooldown. K1 physics remain baseline; higher tiers gain explicit power. Boss warnings pair sound with a visible attack lane and text.

@@ -25,6 +25,7 @@ test("fixed input matches upstream Bird position/velocity in the actual Arcade e
     const samples = [];
     for (let frame = 0; frame < 120; frame++) {
       if (frame % 30 === 0) s.flap();
+      s.fire();
       g.headlessStep(((frame + 1) * 1000) / 60, 1000 / 60);
       if (frame % 6 === 0)
         samples.push({ y: s.bird.y, vy: s.bird.getVelocityY() });
@@ -56,8 +57,18 @@ test("adventure win, physical coins, next level and loss/retry use one core", as
     s.flap();
     for (let frame = 0; frame < 2400 && s.phase === "playing"; frame++) {
       const p = s.obstacles.pairs.find((p: any) => p.x > s.bird.x - 85),
-        target = p?.currentCenter ?? 360;
+        boss = s.combat.boss;
+      let target = p?.currentCenter ?? 360;
+      if (boss) {
+        const threat = s.combat.shots.find(
+          (p: any) => p.active && p.enemy && p.x > 110 && p.x < 340,
+        );
+        target = threat ? Math.min(580, threat.y + 130) : boss.y;
+        if (boss.state === "windup" && boss.elapsed > 600)
+          target = Math.min(580, boss.aimY + 130);
+      }
       if (s.bird.y > target + 20 && s.bird.getVelocityY() > 0) s.flap();
+      s.fire();
       g.headlessStep(((frame + 1) * 1000) / 60, 1000 / 60);
     }
     return { summary: s.summary, spawned: s.obstacles.spawned };

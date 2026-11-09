@@ -40,6 +40,17 @@ class Memory implements StoragePort {
   }
 }
 describe("rewards", () => {
+  it("snapshots tier multiplier once without multiplying clear bonus or star pickups", () => {
+    const s = defaults();
+    const result = applyRun(s, run({ characterId: "nova" }));
+    expect(result.coins).toBe(35);
+    expect(result.stars).toBe(3);
+    expect(applyRun(s, run({ characterId: "nova" })).coins).toBe(0);
+    expect(
+      applyRun(defaults(), run({ outcome: "dead", characterId: "crystal" }))
+        .coins,
+    ).toBe(12);
+  });
   it("stars use physical coins and completed gate count, never bonus score", () => {
     expect(starsFor(run())).toBe(3);
     expect(starsFor(run({ allPassesCentered: false }))).toBe(2);

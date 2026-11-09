@@ -1,4 +1,9 @@
 const paths: Record<string, string> = {
+  pause: "M8 5v14M16 5v14",
+  sound: "M11 4L5 9H2v6h3l6 5V4m4 4a6 6 0 010 8m3-11a10 10 0 010 14",
+  muted: "M11 4L5 9H2v6h3l6 5V4m5 5l6 6m0-6l-6 6",
+  fire: "M12 2c2 6 8 8 8 13a8 8 0 01-16 0c0-4 3-7 5-9 0 5 2 6 3 6 2-2 2-5 0-10z",
+  shield: "M12 3l9 4v6c0 5-9 9-9 9s-9-4-9-9V7l9-4zM8 12l3 3 5-6",
   wing: "M3 17C3 7 14 3 21 4c-2 9-8 16-15 15M6 19l10-9",
   map: "M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2V5zm6-2v16m6-14v16",
   infinity: "M12 12c-3-6-9-6-9 0s6 6 9 0 9-6 9 0-6 6-9 0",

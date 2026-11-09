@@ -1,6 +1,6 @@
 {
   "summary": {
-    "runId": "e7286e96-92af-4153-914e-25993dec9e51",
+    "runId": "8522a300-bfe3-4aa1-8984-6fc59886f89d",
     "mode": "adventure",
     "levelId": "1-1",
     "outcome": "won",
@@ -9,8 +9,9 @@
     "pickupCoins": 4,
     "bonusCoins": 0,
     "nearMisses": 0,
+    "characterId": "spark",
     "allPassesCentered": true,
-    "activeDurationMs": 14366.666666666502
+    "activeDurationMs": 23200.00000000026
   },
   "unlocked": true,
   "endless": true,
