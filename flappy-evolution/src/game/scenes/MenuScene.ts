@@ -17,7 +17,7 @@ export class MenuScene extends Phaser.Scene {
     });
   }
   private notice(): string {
-    return `<p class="notice" role="status">${save.forwardSchema ? "Bu kayıt daha yeni bir sürüme ait. İlerleme bu oturumda saklanıyor." : save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : "İlerleme yalnız bu cihazda ve tarayıcıda saklanır."}</p>`;
+    return `<p class="notice" role="status">${save.forwardSchema ? "Bu kayıt daha yeni bir sürüme ait. İlerleme bu oturumda saklanıyor." : save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : ""}</p>`;
   }
   public home(): void {
     const stars = Object.values(save.data.adventure.levels).reduce(
@@ -26,7 +26,7 @@ export class MenuScene extends Phaser.Scene {
       ),
       final = (save.data.adventure.levels["4-5"]?.bestStars ?? 0) > 0;
     panel(
-      `<div class="home-top"><span class="wordmark">${icon("wing")} FLAPPY EVOLUTION</span><span class="balance">${icon("coin")}${save.data.wallet.coins}</span></div><div class="hero-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><img src="/icons/hero.svg" alt="Gökyüzünde kanat açan Kıvılcım" width="280" height="180"><span class="hero-tag">${evolution(save.data.xp)} · ${save.data.xp} XP</span></div><p class="eyebrow">Her uçuş yeni bir başlangıç</p><h1>Küçük kanatlar.<br><em>Büyük dünyalar.</em></h1><p class="intro">Ritmini bul. Ufku aş. Kendi yolunda evril.</p><div class="mode-cards"><button class="mode-card primary" data-action="adventure" aria-label="Macera">${icon("map")}<span><strong>Macera</strong><small>4 dünya · 20 bölüm · ${stars}/60 yıldız</small></span>${icon("arrow")}</button><button class="mode-card" data-action="endless" aria-label="Sonsuz Uçuş">${icon("infinity")}<span><strong>Sonsuz Uçuş</strong><small>Biraz daha ileri · Rekor ${save.data.endless.bestScore}</small></span>${icon("arrow")}</button></div><div class="grid menu-tools">${button("wardrobe", icon("hanger") + " Gardırop")}${button("settings", icon("settings") + " Ayarlar")}</div>${final ? '<p class="final-badge">Evrim Kapısı tamamlandı · Nova rozeti</p>' : ""}${this.notice()}<p id="offline-status" class="notice">İlk açılış için internet gerekir.</p><div id="update-slot"></div>`,
+      `<div class="home-top"><span class="wordmark">${icon("wing")} FLAPPY EVOLUTION</span><span class="balance">${icon("coin")}${save.data.wallet.coins}</span></div><div class="hero-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><img src="/icons/hero.svg" alt="Gökyüzünde kanat açan Kıvılcım" width="280" height="180"><span class="hero-tag">${evolution(save.data.xp)} · ${save.data.xp} XP</span></div><h1 class="home-title">Uçuşa başla</h1><div class="mode-cards"><button class="mode-card primary" data-action="adventure" aria-label="Macera">${icon("map")}<span><strong>Macera</strong><small>${stars}/60 yıldız</small></span>${icon("arrow")}</button><button class="mode-card" data-action="endless" aria-label="Sonsuz Uçuş">${icon("infinity")}<span><strong>Sonsuz Uçuş</strong><small>Rekor ${save.data.endless.bestScore}</small></span>${icon("arrow")}</button></div><div class="grid menu-tools">${button("wardrobe", icon("hanger") + " Gardırop")}${button("settings", icon("settings") + " Ayarlar")}</div>${final ? '<p class="final-badge">Evrim Kapısı tamamlandı · Nova rozeti</p>' : ""}${this.notice()}<p id="offline-status" class="notice" role="status"></p><div id="update-slot"></div>`,
       (a) => {
         if (a === "adventure") this.scene.start("WorldMapScene");
         else if (a === "endless")
@@ -43,7 +43,7 @@ export class MenuScene extends Phaser.Scene {
   private wardrobe(message = ""): void {
     const inv = save.data.inventory;
     panel(
-      `<p class="eyebrow">${evolution(save.data.xp)} · ${save.data.xp} XP</p><h1>Senin kanatların</h1><p>Tüm görünümler aynı uçuşa ve çarpışma alanına sahip.</p><p role="status">${message}</p><h2>Karakterler</h2><div class="grid">${SKINS.map(
+      `<p class="eyebrow">${evolution(save.data.xp)} · ${save.data.xp} XP</p><h1>Gardırop</h1><p role="status">${message}</p><h2>Karakterler</h2><div class="grid">${SKINS.map(
         (id, i) => {
           const owned = inv.skins.includes(id),
             selected = inv.selectedSkin === id;
@@ -95,7 +95,7 @@ export class MenuScene extends Phaser.Scene {
   }
   private settings(): void {
     panel(
-      `<p class="eyebrow">Uçuş tercihlerin</p><h1>Kendi ritminde</h1><div class="settings-list">${button("sound", save.data.settings.sound ? "Ses: Açık" : "Ses: Kapalı")}<label for="motion">Dekoratif hareket</label><select id="motion"><option value="system" ${save.data.settings.reducedMotion === "system" ? "selected" : ""}>Sistem tercihi</option><option value="on" ${save.data.settings.reducedMotion === "on" ? "selected" : ""}>Azaltılmış</option><option value="off" ${save.data.settings.reducedMotion === "off" ? "selected" : ""}>Tam hareket</option></select><p>Engel hareketleri oyun kuralıdır; değişmez. Dekoratif paralaks ve izler azaltılır.</p>${button("fullscreen", "Tam ekranı dene")}<p>Dokun, Space veya yukarı ok: yüksel. Escape: duraklat. Sekmeden ayrılınca uçuş durur.</p><h2>Yerel rekorlar</h2><p>${save.data.endless.topScores.length ? save.data.endless.topScores.join(" · ") : "İlk rekorunu yazmak için Sonsuz Uçuş’a başla."}</p></div>${button("back", "Menüye dön", true)}${this.notice()}`,
+      `<h1>Ayarlar</h1><div class="settings-list">${button("sound", save.data.settings.sound ? "Ses: Açık" : "Ses: Kapalı")}<label for="motion">Dekoratif hareket</label><select id="motion"><option value="system" ${save.data.settings.reducedMotion === "system" ? "selected" : ""}>Sistem tercihi</option><option value="on" ${save.data.settings.reducedMotion === "on" ? "selected" : ""}>Azaltılmış</option><option value="off" ${save.data.settings.reducedMotion === "off" ? "selected" : ""}>Tam hareket</option></select>${button("fullscreen", "Tam ekranı dene")}<p>Dokun / Space / ↑: yüksel · Esc: duraklat</p><h2>Yerel rekorlar</h2><p>${save.data.endless.topScores.length ? save.data.endless.topScores.join(" · ") : "İlk rekorunu yazmak için Sonsuz Uçuş’a başla."}</p></div>${button("back", "Menüye dön", true)}${this.notice()}`,
       (a) => {
         if (a === "back") this.home();
         else if (a === "sound") {

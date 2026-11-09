@@ -85,6 +85,8 @@ export class PlayScene extends Phaser.Scene {
     this.windTick = 6000;
     this.windRemaining = 0;
     this.lastHud = "";
+    this.trailMs = 0;
+    this.badge = undefined;
     this.director.reset();
     this.difficulty = this.profile(0);
     this.obstacles = new ObstacleSystem(this, this.level);
@@ -105,7 +107,7 @@ export class PlayScene extends Phaser.Scene {
         .setDepth(24);
     }
     this.status = this.add
-      .text(240, 172, "Dokun: yüksel\nBırak: alçal", {
+      .text(240, 172, "Dokun ve uç", {
         fontFamily: "system-ui",
         fontSize: "25px",
         color: "#ffffff",
@@ -214,6 +216,7 @@ export class PlayScene extends Phaser.Scene {
       this.bird.setGameplayGravity(true);
     } else if (this.phase !== "playing") return;
     this.bird.flap();
+    this.flapRipple();
     this.flapCount++;
     this.audioSystem.resume();
     this.audioSystem.flap();
@@ -231,9 +234,10 @@ export class PlayScene extends Phaser.Scene {
           this.phase = this.resumedPhase;
           this.physics.world.resume();
           this.tweens.resumeAll();
+          this.bird.anims.resume();
           this.status.setVisible(this.phase === "ready");
           if (this.phase === "ready")
-            this.status.setText("Dokun: yüksel\nBırak: alçal");
+            this.status.setText("Dokun ve uç");
           this.lastHud = "";
           this.refreshHud();
         }
@@ -284,6 +288,7 @@ export class PlayScene extends Phaser.Scene {
         ) {
           this.pickupCoins++;
           this.audioSystem.coin();
+          this.burst(p.coin.x, p.coin.y, 0xf4ca75, 8);
           p.coin.destroy();
           p.coin = undefined;
         }
@@ -293,6 +298,7 @@ export class PlayScene extends Phaser.Scene {
         this.passedGates++;
         this.score++;
         this.audioSystem.score();
+        this.burst(this.bird.x + 32, this.bird.y, 0xb9e6cf, 4);
         const distance = Math.abs(this.bird.y - p.currentCenter);
         if (distance > 40) this.allPassesCentered = false;
         if (p.currentGap * 0.5 - distance < 18) {
@@ -364,6 +370,31 @@ export class PlayScene extends Phaser.Scene {
       onComplete: () => p.destroy(),
     });
   }
+  // Effects use separate objects: Bird scale, origin and hitbox stay unchanged.
+  private flapRipple(): void {
+    if (this.reducedMotion()) return;
+    const ring = this.add.circle(this.bird.x - 12, this.bird.y + 10, 9)
+      .setStrokeStyle(2, 0xf9f4df, 0.65).setDepth(19);
+    this.tweens.add({
+      targets: ring, x: ring.x - 22, scale: 2.8, alpha: 0,
+      duration: 240, ease: "Sine.Out", onComplete: () => ring.destroy(),
+    });
+  }
+  private burst(x: number, y: number, color: number, count: number): void {
+    if (this.reducedMotion()) return;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const radius = 22 + (i % 3) * 9;
+      const mote = this.add.circle(x, y, i % 2 ? 2 : 3, color).setDepth(35);
+      this.tweens.add({
+        targets: mote,
+        x: x + Math.cos(angle) * radius,
+        y: y + Math.sin(angle) * radius,
+        alpha: 0, scale: 0.25, duration: 380, ease: "Cubic.Out",
+        onComplete: () => mote.destroy(),
+      });
+    }
+  }
   private drawDebug(): void {
     this.debug.clear();
     if (!new URLSearchParams(location.search).has("debug")) return;
@@ -384,12 +415,13 @@ export class PlayScene extends Phaser.Scene {
     this.phase = "paused";
     this.physics.world.pause();
     this.tweens.pauseAll();
+    this.bird.anims.pause();
     this.audioSystem.stop();
     this.showPause();
   }
   private showPause(): void {
     panel(
-      `<p class="eyebrow">Bir nefes al</p><h1>Uçuş duraklatıldı</h1><p>Zaman ve rüzgâr seni bekliyor.</p>${button("resume", "Devam et", true)}${button("menu", "Menüye dön")}`,
+      `<h1>Duraklatıldı</h1>${button("resume", "Devam et", true)}${button("menu", "Menüye dön")}`,
       (a) => {
         if (a === "resume") {
           this.countdown = 3000;
@@ -406,6 +438,10 @@ export class PlayScene extends Phaser.Scene {
     this.phase = outcome;
     this.physics.world.pause();
     this.bird.kill();
+    if (!this.reducedMotion()) {
+      this.burst(this.bird.x, this.bird.y, outcome === "won" ? 0xf4ca75 : 0xf9f4df, 12);
+      if (outcome === "dead") this.cameras.main.shake(140, 0.004);
+    }
     this.windLabel.setVisible(false);
     this.audioSystem.stop();
     outcome === "won" ? this.audioSystem.unlock() : this.audioSystem.hit();
@@ -426,7 +462,7 @@ export class PlayScene extends Phaser.Scene {
     releaseRunLock(this.lockToken);
     this.phase = "results";
     panel(
-      `<p class="eyebrow">${this.level ? `${this.level.id} · ${this.level.name}` : "Sonsuz Uçuş"}</p><h1>${outcome === "won" ? "Kanatların güçlendi!" : "Bir uçuş daha?"}</h1><div class="stars" aria-label="${reward.stars} yıldız">${"★".repeat(reward.stars)}${"☆".repeat(3 - reward.stars)}</div><div class="result-stats"><strong>${this.score}<small>skor</small></strong><strong>+${reward.coins}<small>jeton</small></strong><strong>+${reward.xp}<small>XP</small></strong></div><p>${this.passedGates} geçiş · ${this.pickupCoins} fiziksel jeton · ${this.nearMisses} yakın geçiş</p>${this.level ? (outcome === "won" && this.level.id !== "4-5" ? button("next", "Sonraki bölüm", true) : "") : ""}${button("retry", "Tekrar dene", !this.level || outcome === "dead")}${button("menu", "Menüye dön")}<p class="notice">${save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : "İlerleme bu tarayıcıda kaydedildi"}</p>`,
+      `<p class="eyebrow">${this.level ? `${this.level.id} · ${this.level.name}` : "Sonsuz Uçuş"}</p><h1>${outcome === "won" ? "Bölüm tamamlandı" : "Uçuş bitti"}</h1><div class="stars" aria-label="${reward.stars} yıldız">${"★".repeat(reward.stars)}${"☆".repeat(3 - reward.stars)}</div><div class="result-stats"><strong>${this.score}<small>skor</small></strong><strong>+${reward.coins}<small>jeton</small></strong><strong>+${reward.xp}<small>XP</small></strong></div><p>${this.passedGates} geçiş · ${this.pickupCoins} jeton · ${this.nearMisses} yakın geçiş</p>${this.level ? (outcome === "won" && this.level.id !== "4-5" ? button("next", "Sonraki bölüm", true) : "") : ""}${button("retry", "Tekrar dene", !this.level || outcome === "dead")}${button("menu", "Menüye dön")}<p class="notice">${save.sessionOnly ? "İlerleme bu oturumda saklanıyor" : ""}</p>`,
       (a) => {
         if (a === "retry") void startRun(this, this.request);
         else if (a === "next" && this.level) {

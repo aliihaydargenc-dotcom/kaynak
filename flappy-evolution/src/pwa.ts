@@ -8,8 +8,8 @@ export function installPwa(isMenu: () => boolean): void {
     const status = document.querySelector("#offline-status");
     if (status)
       status.textContent = ready
-        ? "Çevrimdışı hazır · İki mod da yanında"
-        : "İlk açılış için internet gerekir. Offline dosyaları hazırlanıyor.";
+        ? "Çevrimdışı hazır"
+        : "Çevrimdışı hazırlanıyor…";
     const slot = document.querySelector("#update-slot");
     if (slot) {
       slot.innerHTML = registration?.waiting

@@ -12,5 +12,5 @@ One primary action per panel. Results show stars, earned coins, XP and gate/phys
 Shell respects safe-area and 100dvh, 480×854 FIT game space. Landscape letterboxing; no forced zoom restriction. Fullscreen/orientation user-initiated and optional.
 
 ## Motion/audio
-Three-frame 85ms bird texture animation retained. Cosmetic XP ring and trails never alter Bird bounds. Reduced motion uses stored system/on/off setting and disables decorative parallax/trails; gameplay obstacle motion remains. Mute persists, gains disconnected on scene shutdown, oscillators stopped on pause and finish.
+Phaser AnimationManager plays the original three textures in a four-step 2→1→0→1 wing cycle at 85ms per frame; each flap restarts at the raised wing. Pause freezes the animation and collision stops it. Separate short-lived tween objects provide flap rings and reward bursts without scaling or moving the Bird. Cosmetic XP ring and trails never alter Bird bounds. Reduced motion uses stored system/on/off setting and disables decorative parallax/trails/rings/bursts/camera shake and CSS transitions; gameplay obstacle motion remains. Mute persists, gains disconnected on scene shutdown, oscillators stopped on pause and finish.
 Real-time gameplay screen-reader equivalence is not claimed. Menus, instructions, results and control names are semantic HTML.

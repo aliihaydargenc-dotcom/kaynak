@@ -13,7 +13,7 @@ export class WorldMapScene extends Phaser.Scene {
       0,
     );
     panel(
-      `<header class="map-header"><p class="eyebrow">Macera · ${stars}/60 yıldız</p><h1>Ufkun ötesine</h1><p>Dört dünya. Yirmi yeni başlangıç.</p></header><div class="worlds">${WORLDS.map(
+      `<header class="map-header"><p class="eyebrow">Macera · ${stars}/60 yıldız</p><h1>Bölüm seç</h1></header><div class="worlds">${WORLDS.map(
         (name, i) =>
           `<article class="world world-${i + 1}"><p class="eyebrow">Dünya 0${i + 1}</p><h2>${name}</h2><div class="levels">${LEVELS.filter(
             (l) => l.world === i + 1,

@@ -4,9 +4,7 @@ import { BIRD_GRAVITY, DEFAULT_FLAP_POWER } from "../constants";
 const FRAME_KEYS = ["bird-spark-0", "bird-spark-1", "bird-spark-2"];
 
 export class Bird extends Phaser.Physics.Arcade.Sprite {
-  private frameKeys = FRAME_KEYS;
-  private frameTimer = 0;
-  private frameIndex = 0;
+  private flightAnimation = "";
   private isAlive = true;
 
   public constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -28,8 +26,16 @@ export class Bird extends Phaser.Physics.Arcade.Sprite {
   }
 
   public applyAppearance(id: string): void {
-    this.frameKeys = [0, 1, 2].map((frame) => `bird-${id}-${frame}`);
-    this.setTexture(this.frameKeys[this.frameIndex]);
+    this.flightAnimation = `flight-${id}`;
+    if (!this.scene.anims.exists(this.flightAnimation)) {
+      this.scene.anims.create({
+        key: this.flightAnimation,
+        frames: [2, 1, 0, 1].map((frame) => ({ key: `bird-${id}-${frame}` })),
+        frameRate: 1000 / 85,
+        repeat: -1,
+      });
+    }
+    this.play(this.flightAnimation);
   }
 
   public setGameplayGravity(enabled: boolean): void {
@@ -48,21 +54,11 @@ export class Bird extends Phaser.Physics.Arcade.Sprite {
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityY(-power);
-    this.frameTimer = 0;
-    this.frameIndex = 2;
-    this.setTexture(this.frameKeys[this.frameIndex]);
+    this.play(this.flightAnimation);
   }
 
-  public updateBird(deltaMs: number): void {
+  public updateBird(_deltaMs: number): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
-    this.frameTimer += deltaMs;
-
-    if (this.frameTimer >= 85) {
-      this.frameTimer = 0;
-      this.frameIndex = (this.frameIndex + 1) % this.frameKeys.length;
-      this.setTexture(this.frameKeys[this.frameIndex]);
-    }
-
     const targetAngle = Phaser.Math.Clamp(body.velocity.y * 0.06, -24, 85);
     this.angle = Phaser.Math.Linear(this.angle, targetAngle, 0.15);
   }
@@ -79,6 +75,7 @@ export class Bird extends Phaser.Physics.Arcade.Sprite {
 
   public kill(): void {
     this.isAlive = false;
+    this.anims.stop();
   }
 
   public revive(): void {
